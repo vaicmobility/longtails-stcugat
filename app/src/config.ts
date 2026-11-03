@@ -4,19 +4,24 @@ export const PROGRAMA = {
   empresa_nom: 'VAIC Mobility',
   lloc_lliurament: 'Botiga VAIC',
   lloc_horari_retorn: 'Botiga VAIC · (horari a definir)',
+  // Canal únic de comunicació i incidències. Els camps sense valor es mostren com a "—" als annexos.
   canal: {
-    telefon: '(a definir)',
-    email: '(a definir)',
-    formulari: "Portal d'usuaris VAIC (enllaç personal enviat al lliurament)",
-    horari: '(a definir)',
-    urgencies: '(a definir)',
+    telefon: '—',
+    email: '—',
+    formulari: 'https://longtail.vaic.com',
+    horari: '—',
+    urgencies: '—',
   },
   // Filtre per defecte en cercar bicis disponibles
   tipus_bici_programa: ['longtail', 'cargo'],
 }
 
 export const canalResum = () =>
-  [`Tel. ${PROGRAMA.canal.telefon}`, PROGRAMA.canal.email, PROGRAMA.canal.formulari].join(' · ')
+  [
+    PROGRAMA.canal.formulari,
+    PROGRAMA.canal.telefon !== '—' && `Tel. ${PROGRAMA.canal.telefon}`,
+    PROGRAMA.canal.email !== '—' && PROGRAMA.canal.email,
+  ].filter(Boolean).join(' · ')
 
 // Elements que es proposen per defecte a l'acta de lliurament
 export const ELEMENTS_PER_DEFECTE = [
