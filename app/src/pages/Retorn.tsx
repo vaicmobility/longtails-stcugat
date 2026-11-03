@@ -108,7 +108,7 @@ export function Retorn() {
               Persona beneficiària
             </button>
             <button type="button" className={r.condicio === 'autoritzada' ? 'on' : ''}
-              onClick={() => setR({ ...r, condicio: 'autoritzada', retorn_persona: lliurament.adult_nom, retorn_persona_document: '' })}>
+              onClick={() => setR({ ...r, condicio: 'autoritzada', retorn_persona: lliurament.adult_nom, retorn_persona_document: lliurament.adult_document ?? '' })}>
               Persona adulta autoritzada
             </button>
           </div>

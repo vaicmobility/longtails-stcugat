@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { PRIVACITAT_TEXT, enviarPreinscripcio, type DadesPreinscripcio } from '../lib/preinscripcio'
 
-const buit: DadesPreinscripcio = { email: '', nom: '', document: '', telefon: '', escola_bressol: '', infant: '', adult_nom: '' }
+const buit: DadesPreinscripcio = { email: '', nom: '', document: '', telefon: '', escola_bressol: '', infant: '', adult_nom: '', adult_document: '' }
 
 /** Formulari públic de preinscripció (sense login). */
 export function Inscripcio() {
@@ -17,6 +17,7 @@ export function Inscripcio() {
   if (!/^\S+@\S+\.\S+$/.test(d.email.trim())) errors.push('correu electrònic vàlid')
   if (d.nom.trim().length < 2) errors.push('nom i cognoms')
   if (d.document.trim().length < 5) errors.push('DNI/NIE')
+  if (d.adult_nom.trim() && d.adult_document.trim().length < 5) errors.push("DNI/NIE de l'altra persona adulta")
   if (!privacitat) errors.push('acceptar la política de privacitat')
 
   const enviar = async (e: React.FormEvent) => {
@@ -63,8 +64,11 @@ export function Inscripcio() {
             <label>Telèfon<input type="tel" inputMode="tel" autoComplete="tel" value={d.telefon} onChange={(e) => set('telefon', e.target.value)} /></label>
             <label>Escola bressol municipal<input value={d.escola_bressol} onChange={(e) => set('escola_bressol', e.target.value)} /></label>
             <label className="span2">Infant matriculat / unitat familiar<input value={d.infant} onChange={(e) => set('infant', e.target.value)} /></label>
-            <label className="span2">Altra persona adulta autoritzada a fer servir la bicicleta (opcional)
+            <label>Altra persona adulta autoritzada (opcional)
               <input value={d.adult_nom} onChange={(e) => set('adult_nom', e.target.value)} placeholder="Nom i cognoms" />
+            </label>
+            <label>DNI/NIE de l'altra persona adulta{d.adult_nom.trim() ? ' *' : ''}
+              <input value={d.adult_document} onChange={(e) => set('adult_document', e.target.value.toUpperCase())} />
             </label>
             <label aria-hidden="true" style={{ position: 'absolute', left: '-9999px' }}>Web
               <input tabIndex={-1} autoComplete="off" value={web} onChange={(e) => setWeb(e.target.value)} />

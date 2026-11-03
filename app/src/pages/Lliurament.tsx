@@ -27,6 +27,7 @@ const actaBuida = (): ActaLliurament => ({
   beneficiaria_telefon: '',
   beneficiaria_email: '',
   adult_nom: '',
+  adult_document: '',
   infant_unitat_familiar: '',
   lliurament_data_hora: ara(),
   lliurament_lloc: PROGRAMA.lloc_lliurament,
@@ -78,6 +79,7 @@ export function Lliurament() {
       escola_bressol: p.escola_bressol ?? x.escola_bressol,
       infant_unitat_familiar: p.infant_unitat_familiar ?? x.infant_unitat_familiar,
       adult_nom: p.adult_nom ?? x.adult_nom,
+      adult_document: p.adult_document ?? x.adult_document,
     }))
     setAvis(`Dades de la preinscripció del ${new Date(p.created_at).toLocaleDateString('ca-ES')}. Revisa-les amb la persona.`)
   }
@@ -126,6 +128,7 @@ export function Lliurament() {
       escola_bressol: x.escola_bressol || u.escola_bressol || '',
       infant_unitat_familiar: x.infant_unitat_familiar || u.infant_unitat_familiar || '',
       adult_nom: x.adult_nom || u.adult_nom || '',
+      adult_document: x.adult_document || u.adult_document || '',
     }))
     if (!clientId && u.client_id) setClientId(u.client_id)
     setAvis('Usuari conegut: dades omplertes a partir de la seva darrera cessió. Revisa-les.')
@@ -148,6 +151,7 @@ export function Lliurament() {
       if (!a.beneficiaria_nom.trim()) e.push('Nom i cognoms')
       if (!a.beneficiaria_document.trim()) e.push('DNI/NIE')
       if (!clientId) e.push('Organització')
+      if (a.adult_nom.trim() && (a.adult_document ?? '').trim().length < 5) e.push("DNI/NIE de l'adult autoritzat")
     }
     if (pas === 1) {
       if (!bici) e.push('Tria una bicicleta')
@@ -219,8 +223,11 @@ export function Lliurament() {
             </label>
             <label>Escola bressol municipal<input value={a.escola_bressol} onChange={(e) => set('escola_bressol', e.target.value)} /></label>
             <label>Infant matriculat / unitat familiar<input value={a.infant_unitat_familiar} onChange={(e) => set('infant_unitat_familiar', e.target.value)} /></label>
-            <label className="span2">Altra persona adulta autoritzada (opcional)
+            <label>Altra persona adulta autoritzada (opcional)
               <input value={a.adult_nom} onChange={(e) => set('adult_nom', e.target.value)} placeholder="Nom i cognoms" />
+            </label>
+            <label>DNI/NIE de l'adult autoritzat{a.adult_nom.trim() ? ' *' : ''}
+              <input value={a.adult_document ?? ''} onChange={(e) => set('adult_document', e.target.value.toUpperCase())} />
             </label>
             <label className="span2">Ajuntament / servei gestor<input value={a.servei_gestor} onChange={(e) => set('servei_gestor', e.target.value)} /></label>
           </div>
@@ -295,7 +302,7 @@ export function Lliurament() {
             <SignaturePad label="Persona beneficiària" sublabel={a.beneficiaria_nom} value={a.signatures.benef}
               onChange={(v) => setA((x) => ({ ...x, signatures: { ...x.signatures, benef: v } }))} />
             {a.adult_nom.trim() ? (
-              <SignaturePad label="Altra persona adulta autoritzada" sublabel={a.adult_nom} value={a.signatures.adult}
+              <SignaturePad label="Altra persona adulta autoritzada" sublabel={[a.adult_nom, a.adult_document].filter(Boolean).join(' · ')} value={a.signatures.adult}
                 onChange={(v) => setA((x) => ({ ...x, signatures: { ...x.signatures, adult: v } }))} />
             ) : null}
             <SignaturePad label="Per compte de l'empresa contractista" sublabel={a.tecnic_nom || PROGRAMA.empresa_nom} value={a.signatures.tecnic}
