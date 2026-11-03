@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../components/Auth'
 import { data } from '../lib/format'
 import { llistarPreinscripcions, marcarPreinscripcio, type Preinscripcio } from '../lib/preinscripcio'
 
 const FILTRES = [['pendent', 'Pendents'], ['convertida', 'Amb cessió'], ['descartada', 'Descartades'], ['', 'Totes']] as const
 
 export function Preinscripcions() {
+  const { admin } = useAuth()
   const [estat, setEstat] = useState<string>('pendent')
   const [text, setText] = useState('')
   const [llista, setLlista] = useState<Preinscripcio[] | null>(null)
@@ -54,7 +56,7 @@ export function Preinscripcions() {
             </div>
             <span className="pill">{p.estat}</span>
             <div className="row-actions" style={{ display: 'flex', gap: '.4rem' }}>
-              {p.estat === 'pendent' ? (
+              {admin && p.estat === 'pendent' ? (
                 <>
                   <Link className="btn primary small" to={`/botiga/nova?preinscripcio=${p.id}`}>Fer lliurament</Link>
                   <button className="btn ghost small" onClick={() => descartar(p)}>Descartar</button>
