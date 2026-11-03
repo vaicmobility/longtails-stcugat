@@ -1,14 +1,8 @@
 import { supabase } from './supabase'
 
 /** Canvia la versió cada cop que es modifiqui el text, perquè quedi constància de què va acceptar cadascú. */
-export const PRIVACITAT_VERSIO = 'AJ-STCUGAT-T218-2026-11'
-
-// Text de la clàusula de l'Ajuntament (plantilla oficial d'annexos). PENDENT de validar amb l'Ajuntament / DPD.
-export const PRIVACITAT_TEXT = [
-  "Les dades que facilites en aquest formulari s'utilitzaran per preparar la cessió de la bicicleta del programa de longtails i l'acta de lliurament corresponent.",
-  "Us informem que les vostres dades seran incorporades al tractament T218 Campanyes de sensibilització ambiental responsabilitat de l'Ajuntament de Sant Cugat del Vallès per a portar a terme l'autorització indicada. Les vostres dades seran conservades com a part dels procediments administratius de l'Ajuntament. Les vostres dades no seran cedides a tercers excepte que sigui necessari per portar a terme el tràmit sol·licitat, d'acord amb la legislació vigent.",
-  "Així mateix s'informa de la possibilitat d'exercir els seus drets d'accés, rectificació, supressió, oposició, portabilitat i limitació de les dades mitjançant la remissió d'un escrit dirigit a Ajuntament de Sant Cugat del Vallès, Atenció Ciutadana, Plaça de la Vila, 1, 08172 Sant Cugat del Vallès, indicant \"Ref. Protecció de dades\" o bé exercir el seu dret a través de la Seu Electrònica. Per a més informació consulteu la pàgina web: https://www.santcugat.cat/web/proteccio-de-dades",
-]
+// El text de la política és a lib/textos.ts (POLITICA_PRIVACITAT).
+export const PRIVACITAT_VERSIO = 'VAIC-PRIVACITAT-2026-11-03'
 
 export type Preinscripcio = {
   id: string

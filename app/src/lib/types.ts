@@ -65,6 +65,7 @@ export type ActaLliurament = {
   num_fotos: number
   tecnic_nom: string
   signatures: { benef: string | null; adult: string | null; tecnic: string | null }
+  documentacio_llegida_at?: string // quan la persona confirma que ha llegit els annexos
 }
 
 export type ActaRetorn = {
@@ -82,6 +83,7 @@ export type ActaRetorn = {
   num_fotos: number
   tecnic_nom: string
   signatures: { persona: string | null; tecnic: string | null }
+  documentacio_llegida_at?: string
 }
 
 export type CessioActa = {
