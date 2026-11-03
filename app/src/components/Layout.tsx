@@ -11,6 +11,7 @@ export function Layout({ children }: { children: ReactNode }) {
         <Link to="/botiga" className="brand">VAIC <span>Cessions</span></Link>
         <nav>
           <NavLink to="/botiga" end>Cessions</NavLink>
+          <NavLink to="/botiga/preinscripcions">Preinscripcions</NavLink>
           <NavLink to="/botiga/nova" className="btn primary small">+ Nou lliurament</NavLink>
         </nav>
         <div className="user">
