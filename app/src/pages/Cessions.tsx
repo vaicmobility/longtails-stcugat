@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import { useAuth } from '../components/Auth'
 import { llistarCessions, refCessio } from '../lib/api'
 import { data, marcaModel } from '../lib/format'
 import type { Cessio } from '../lib/types'
@@ -12,6 +13,7 @@ const FILTRES = [
 ] as const
 
 export function Cessions() {
+  const { admin } = useAuth()
   const [estat, setEstat] = useState<string>('')
   const [text, setText] = useState('')
   const [cessions, setCessions] = useState<Cessio[] | null>(null)
@@ -30,7 +32,7 @@ export function Cessions() {
     <div>
       <div className="page-head">
         <h1>Cessions</h1>
-        <Link to="/botiga/nova" className="btn primary">+ Nou lliurament</Link>
+        {admin ? <Link to="/botiga/nova" className="btn primary">+ Nou lliurament</Link> : null}
       </div>
       <div className="toolbar">
         <div className="seg">
@@ -52,8 +54,8 @@ export function Cessions() {
             </div>
             <span className={`pill ${c.estat}`}>{c.estat}</span>
             <div className="row-actions">
-              {c.estat === 'programada' ? <Link className="btn primary small" to={`/botiga/nova?cessio=${c.id}`}>Fer lliurament</Link> : null}
-              {c.estat === 'activa' ? <Link className="btn primary small" to={`/botiga/retorn/${c.id}`}>Retorn</Link> : null}
+              {admin && c.estat === 'programada' ? <Link className="btn primary small" to={`/botiga/nova?cessio=${c.id}`}>Fer lliurament</Link> : null}
+              {admin && c.estat === 'activa' ? <Link className="btn primary small" to={`/botiga/retorn/${c.id}`}>Retorn</Link> : null}
             </div>
           </div>
         ))}

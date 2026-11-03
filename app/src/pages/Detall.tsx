@@ -1,11 +1,13 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
+import { useAuth } from '../components/Auth'
 import { getActes, getCessio, refCessio, urlSignada } from '../lib/api'
 import { data, dataHora, identificacioBici, marcaModel } from '../lib/format'
 import type { ActaLliurament, Cessio, CessioActa } from '../lib/types'
 
 export function Detall() {
   const { id } = useParams()
+  const { admin } = useAuth()
   const [c, setC] = useState<Cessio | null>(null)
   const [actes, setActes] = useState<CessioActa[]>([])
   const [error, setError] = useState<string | null>(null)
@@ -99,8 +101,8 @@ export function Detall() {
       </section>
 
       <div className="actions">
-        {c.estat === 'programada' ? <Link className="btn primary" to={`/botiga/nova?cessio=${c.id}`}>Fer lliurament</Link> : null}
-        {c.estat === 'activa' && l ? <Link className="btn primary" to={`/botiga/retorn/${c.id}`}>Registrar retorn</Link> : null}
+        {admin && c.estat === 'programada' ? <Link className="btn primary" to={`/botiga/nova?cessio=${c.id}`}>Fer lliurament</Link> : null}
+        {admin && c.estat === 'activa' && l ? <Link className="btn primary" to={`/botiga/retorn/${c.id}`}>Registrar retorn</Link> : null}
       </div>
     </div>
   )
