@@ -1,7 +1,8 @@
 import { useEffect, useState } from 'react'
 import { Link, useParams } from 'react-router-dom'
 import { useAuth } from '../components/Auth'
-import { getActes, getCessio, refCessio, urlSignada } from '../lib/api'
+import { getActes, getCessio, refCessio } from '../lib/api'
+import { BUCKET, supabase } from '../lib/supabase'
 import { data, dataHora, identificacioBici, marcaModel } from '../lib/format'
 import type { ActaLliurament, Cessio, CessioActa } from '../lib/types'
 
@@ -17,12 +18,29 @@ export function Detall() {
     Promise.all([getCessio(id), getActes(id)]).then(([c, a]) => { setC(c); setActes(a) }).catch((e) => setError(e.message))
   }, [id])
 
+  /**
+   * Descarrega el fitxer amb la sessió de l'usuari (sense enllaços compartibles):
+   * el contingut arriba com a blob i s'obre amb una URL local (blob:) que només funciona en aquest navegador.
+   */
   const obrir = async (path: string | null, nom?: string) => {
     if (!path) return
+    const esPdf = path.toLowerCase().endsWith('.pdf')
+    const finestra = esPdf || !nom ? window.open('', '_blank') : null // obrir abans de l'await (bloqueig de popups)
     try {
-      const url = await urlSignada(path, nom)
-      window.open(url, '_blank')
+      const { data: blob, error } = await supabase.storage.from(BUCKET).download(path)
+      if (error || !blob) throw new Error(error?.message || "No s'ha pogut descarregar el fitxer")
+      const url = URL.createObjectURL(blob)
+      if (finestra) {
+        finestra.location.href = url
+      } else {
+        const a = document.createElement('a')
+        a.href = url
+        a.download = nom || path.split('/').pop() || 'document'
+        a.click()
+      }
+      setTimeout(() => URL.revokeObjectURL(url), 60_000)
     } catch (e) {
+      finestra?.close()
       setError((e as Error).message)
     }
   }
