@@ -8,6 +8,7 @@ import { Cessions } from './pages/Cessions'
 import { Detall } from './pages/Detall'
 import { Inscripcio } from './pages/Inscripcio'
 import { Lliurament } from './pages/Lliurament'
+import { Portal } from './pages/Portal'
 import { Preinscripcions } from './pages/Preinscripcions'
 import { Retorn } from './pages/Retorn'
 
@@ -31,6 +32,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/botiga/preinscripcions" element={<Botiga><Preinscripcions /></Botiga>} />
           {/* Públic, sense login */}
           <Route path="/inscripcio" element={<Inscripcio />} />
+          <Route path="/portal" element={<Portal />} />
           {/* Pròximament: /c/:token portal d'usuaris */}
           <Route path="*" element={<Navigate to="/botiga" replace />} />
         </Routes>
