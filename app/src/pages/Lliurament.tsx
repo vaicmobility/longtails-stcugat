@@ -5,6 +5,7 @@ import { SignaturePad } from '../components/SignaturePad'
 import { ELEMENTS_PER_DEFECTE, ESTATS_ELEMENT, PROGRAMA, canalResum } from '../config'
 import { cercarBicis, cercarUsuariPerEmail, finalitzarLliurament, getCessio, llistarOrganitzacions } from '../lib/api'
 import { ara, identificacioBici, marcaModel } from '../lib/format'
+import { darreraPreinscripcio, getPreinscripcio, marcarPreinscripcio, type Preinscripcio } from '../lib/preinscripcio'
 import type { ActaLliurament, Bicicleta, ElementLliurat, Organitzacio } from '../lib/types'
 import { Resultat } from './Resultat'
 
@@ -45,6 +46,7 @@ export function Lliurament() {
   const [params] = useSearchParams()
   const nav = useNavigate()
   const cessioId = params.get('cessio')
+  const [preinsId, setPreinsId] = useState<string | null>(params.get('preinscripcio'))
   const [pas, setPas] = useState(0)
   const [a, setA] = useState<ActaLliurament>(actaBuida)
   const [clientId, setClientId] = useState<string | null>(null)
@@ -61,6 +63,36 @@ export function Lliurament() {
   useEffect(() => {
     llistarOrganitzacions().then(setOrgs).catch(() => {})
   }, [])
+
+  // Organització del programa per defecte quan les dades venen d'una preinscripció
+  const orgPrograma = () => orgs.find((o) => /ajuntament/i.test(o.nom) && /sant cugat/i.test(o.nom))?.id ?? null
+
+  const aplicarPreinscripcio = (p: Preinscripcio) => {
+    setPreinsId(p.id)
+    setA((x) => ({
+      ...x,
+      beneficiaria_email: p.email,
+      beneficiaria_nom: p.nom,
+      beneficiaria_document: p.document,
+      beneficiaria_telefon: p.telefon ?? x.beneficiaria_telefon,
+      escola_bressol: p.escola_bressol ?? x.escola_bressol,
+      infant_unitat_familiar: p.infant_unitat_familiar ?? x.infant_unitat_familiar,
+      adult_nom: p.adult_nom ?? x.adult_nom,
+    }))
+    setAvis(`Dades de la preinscripció del ${new Date(p.created_at).toLocaleDateString('ca-ES')}. Revisa-les amb la persona.`)
+  }
+
+  useEffect(() => {
+    const id = params.get('preinscripcio')
+    if (!id || cessioId) return
+    getPreinscripcio(id).then(aplicarPreinscripcio).catch((e) => setError(e.message))
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
+
+  useEffect(() => {
+    if (preinsId && !clientId && orgs.length) setClientId(orgPrograma())
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [preinsId, orgs])
 
   // Cessió programada des de l'app interna: omplim dades
   useEffect(() => {
@@ -82,6 +114,8 @@ export function Lliurament() {
 
   const buscarEmail = async () => {
     if (!a.beneficiaria_email.includes('@')) return
+    const p = await darreraPreinscripcio(a.beneficiaria_email).catch(() => null)
+    if (p) { aplicarPreinscripcio(p); return }
     const u = await cercarUsuariPerEmail(a.beneficiaria_email).catch(() => null)
     if (!u) { setAvis('Usuari nou: omple les seves dades.'); return }
     setA((x) => ({
@@ -137,7 +171,9 @@ export function Lliurament() {
     setError(null)
     try {
       localStorage.setItem('vaic_tecnic_nom', a.tecnic_nom)
-      setResultat(await finalitzarLliurament({ cessioId, clientId, bici, acta: a, fotos }))
+      const r = await finalitzarLliurament({ cessioId, clientId, bici, acta: a, fotos })
+      if (preinsId) await marcarPreinscripcio(preinsId, 'convertida', r.cessioId).catch(() => {})
+      setResultat(r)
     } catch (e) {
       setError((e as Error).message)
     } finally {
