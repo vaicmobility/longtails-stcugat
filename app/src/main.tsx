@@ -6,7 +6,9 @@ import { Layout } from './components/Layout'
 import './index.css'
 import { Cessions } from './pages/Cessions'
 import { Detall } from './pages/Detall'
+import { Inscripcio } from './pages/Inscripcio'
 import { Lliurament } from './pages/Lliurament'
+import { Preinscripcions } from './pages/Preinscripcions'
 import { Retorn } from './pages/Retorn'
 
 const Botiga = ({ children }: { children: React.ReactNode }) => (
@@ -23,6 +25,9 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/botiga/nova" element={<Botiga><Lliurament /></Botiga>} />
           <Route path="/botiga/retorn/:id" element={<Botiga><Retorn /></Botiga>} />
           <Route path="/botiga/cessio/:id" element={<Botiga><Detall /></Botiga>} />
+          <Route path="/botiga/preinscripcions" element={<Botiga><Preinscripcions /></Botiga>} />
+          {/* Públic, sense login */}
+          <Route path="/inscripcio" element={<Inscripcio />} />
           {/* Pròximament: /c/:token portal d'usuaris */}
           <Route path="*" element={<Navigate to="/botiga" replace />} />
         </Routes>
