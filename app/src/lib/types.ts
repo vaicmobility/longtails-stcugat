@@ -51,6 +51,7 @@ export type ActaLliurament = {
   beneficiaria_telefon: string
   beneficiaria_email: string
   adult_nom: string // altra persona adulta autoritzada (signa)
+  adult_document?: string // DNI/NIE de l'adult autoritzat (actes antigues no en tenen)
   infant_unitat_familiar: string
   lliurament_data_hora: string // ISO
   lliurament_lloc: string

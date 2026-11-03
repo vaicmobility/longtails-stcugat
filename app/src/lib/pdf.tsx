@@ -129,7 +129,7 @@ const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
         ['Ajuntament / servei gestor', a.servei_gestor],
         ['Escola bressol municipal', a.escola_bressol],
         ['Persona beneficiària', a.beneficiaria_nom],
-        ['Altres persones adultes autoritzades', a.adult_nom],
+        ['Altres persones adultes autoritzades', [a.adult_nom, a.adult_document && `DNI/NIE: ${a.adult_document}`].filter(Boolean).join(' · ')],
         ['DNI/NIE o document identificatiu', a.beneficiaria_document],
         ['Telèfon i correu electrònic', [a.beneficiaria_telefon, a.beneficiaria_email].filter(Boolean).join(' · ')],
         ['Infant matriculat / unitat familiar', a.infant_unitat_familiar],
@@ -179,7 +179,7 @@ const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
       {a.adult_nom ? (
         <View style={[s.row, { borderLeft: `0.6pt solid ${BORDER}`, width: '50%' }]}>
           <SigBlock title="Altres persones adultes autoritzades" src={a.signatures.adult}
-            lines={[`Nom i cognoms: ${a.adult_nom}`, `Data: ${data(a.lliurament_data_hora)}`]} />
+            lines={[`Nom i cognoms: ${a.adult_nom}`, `DNI/NIE: ${a.adult_document ?? ''}`, `Data: ${data(a.lliurament_data_hora)}`]} />
         </View>
       ) : null}
     </View>

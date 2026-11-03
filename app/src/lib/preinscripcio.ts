@@ -19,6 +19,7 @@ export type Preinscripcio = {
   escola_bressol: string | null
   infant_unitat_familiar: string | null
   adult_nom: string | null
+  adult_document: string | null
   privacitat_versio: string
   privacitat_acceptada_at: string
   estat: 'pendent' | 'convertida' | 'descartada'
@@ -28,14 +29,14 @@ export type Preinscripcio = {
 
 export type DadesPreinscripcio = {
   email: string; nom: string; document: string; telefon: string
-  escola_bressol: string; infant: string; adult_nom: string
+  escola_bressol: string; infant: string; adult_nom: string; adult_document: string
 }
 
 /** Públic (sense login): només insereix, no retorna dades. */
 export async function enviarPreinscripcio(d: DadesPreinscripcio) {
-  const { error } = await supabase.rpc('crear_preinscripcio', {
+  const { error } = await supabase.rpc('crear_preinscripcio_v2', {
     _email: d.email, _nom: d.nom, _document: d.document, _telefon: d.telefon,
-    _escola_bressol: d.escola_bressol, _infant: d.infant, _adult_nom: d.adult_nom,
+    _escola_bressol: d.escola_bressol, _infant: d.infant, _adult_nom: d.adult_nom, _adult_document: d.adult_document,
     _privacitat_versio: PRIVACITAT_VERSIO,
   })
   if (error) throw new Error(error.message)

@@ -39,7 +39,7 @@ export async function cercarUsuariPerEmail(email: string) {
   if (!r.length) return null
   const actes = await getActes(r[0].id)
   const l = actes.find((a) => a.fase === 'lliurament')?.dades as ActaLliurament | undefined
-  return { ...r[0], escola_bressol: l?.escola_bressol, infant_unitat_familiar: l?.infant_unitat_familiar, adult_nom: l?.adult_nom }
+  return { ...r[0], escola_bressol: l?.escola_bressol, infant_unitat_familiar: l?.infant_unitat_familiar, adult_nom: l?.adult_nom, adult_document: l?.adult_document }
 }
 
 /**
