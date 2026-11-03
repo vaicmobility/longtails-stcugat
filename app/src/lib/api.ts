@@ -100,11 +100,6 @@ async function pujarFotos(cessioId: string, fase: string, fotos: File[]) {
   return paths
 }
 
-export async function urlSignada(path: string, descarregar?: string) {
-  const r = ok(await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 10, descarregar ? { download: descarregar } : undefined))
-  return r.signedUrl
-}
-
 /** Lliurament: crea (o actualitza una cessió programada), genera PDF + Word, desa-ho tot. No toca l'estat de la bici. */
 export async function finalitzarLliurament(params: {
   cessioId?: string | null
