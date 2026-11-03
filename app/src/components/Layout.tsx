@@ -4,15 +4,15 @@ import { supabase } from '../lib/supabase'
 import { useAuth } from './Auth'
 
 export function Layout({ children }: { children: ReactNode }) {
-  const { session } = useAuth()
+  const { session, admin } = useAuth()
   return (
     <div className="shell">
       <header className="topbar">
         <Link to="/botiga" className="brand">VAIC <span>Cessions</span></Link>
         <nav>
           <NavLink to="/botiga" end>Cessions</NavLink>
-          <NavLink to="/botiga/preinscripcions">Preinscripcions</NavLink>
-          <NavLink to="/botiga/nova" className="btn primary small">+ Nou lliurament</NavLink>
+          {admin ? <NavLink to="/botiga/preinscripcions">Preinscripcions</NavLink> : null}
+          {admin ? <NavLink to="/botiga/nova" className="btn primary small">+ Nou lliurament</NavLink> : <span className="pill">Mode consulta</span>}
         </nav>
         <div className="user">
           <span className="muted">{session?.user.email}</span>
