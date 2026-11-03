@@ -28,7 +28,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/botiga/nova" element={<NomesAdmin><Lliurament /></NomesAdmin>} />
           <Route path="/botiga/retorn/:id" element={<NomesAdmin><Retorn /></NomesAdmin>} />
           <Route path="/botiga/cessio/:id" element={<Botiga><Detall /></Botiga>} />
-          <Route path="/botiga/preinscripcions" element={<NomesAdmin><Preinscripcions /></NomesAdmin>} />
+          <Route path="/botiga/preinscripcions" element={<Botiga><Preinscripcions /></Botiga>} />
           {/* Públic, sense login */}
           <Route path="/inscripcio" element={<Inscripcio />} />
           {/* Pròximament: /c/:token portal d'usuaris */}
