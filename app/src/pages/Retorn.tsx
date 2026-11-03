@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useParams } from 'react-router-dom'
 import { Fotos, Steps } from '../components/Layout'
 import { SignaturePad } from '../components/SignaturePad'
+import { TextAnnexII } from '../components/Documentacio'
 import { ESTATS_ELEMENT, PROGRAMA } from '../config'
 import { finalitzarRetorn, getActes, getCessio } from '../lib/api'
 import { ara, data, durada } from '../lib/format'
@@ -69,6 +70,7 @@ export function Retorn() {
     if (!r.tecnic_nom.trim()) errorsPas.push('Nom del tècnic VAIC')
     if (!r.signatures.persona) errorsPas.push('Signatura de qui retorna')
     if (!r.signatures.tecnic) errorsPas.push('Signatura del tècnic')
+    if (!r.documentacio_llegida_at) errorsPas.push('Confirmar la lectura de les condicions')
   }
 
   const generar = async () => {
@@ -157,7 +159,14 @@ export function Retorn() {
 
       {pas === 2 && (
         <section className="card">
-          <h2>Signatures</h2>
+          <h2>Condicions de l'acta de devolució</h2>
+          <TextAnnexII obert />
+          <label className="check">
+            <input type="checkbox" checked={!!r.documentacio_llegida_at}
+              onChange={(e) => set('documentacio_llegida_at', e.target.checked ? new Date().toISOString() : undefined)} />
+            <span>La persona que retorna la bicicleta ha llegit les condicions de l'Annex II. *</span>
+          </label>
+          <h2 className="mt">Signatures</h2>
           <label>Tècnic VAIC: nom, cognoms i càrrec *<input value={r.tecnic_nom} onChange={(e) => set('tecnic_nom', e.target.value)} /></label>
           <div className="sigs">
             <SignaturePad label="Persona que efectua el retorn" sublabel={r.retorn_persona} value={r.signatures.persona}

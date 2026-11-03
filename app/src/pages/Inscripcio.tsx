@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import { PRIVACITAT_TEXT, enviarPreinscripcio, type DadesPreinscripcio } from '../lib/preinscripcio'
+import { Seccions } from '../components/Documentacio'
+import { enviarPreinscripcio, type DadesPreinscripcio } from '../lib/preinscripcio'
+import { POLITICA_PRIVACITAT } from '../lib/textos'
 
 const buit: DadesPreinscripcio = { email: '', nom: '', document: '', telefon: '', escola_bressol: '', infant: '', adult_nom: '', adult_document: '' }
 
@@ -49,6 +51,7 @@ export function Inscripcio() {
           <h1>Preinscripció enviada</h1>
           <p>Gràcies, {d.nom.split(' ')[0] || 'hem rebut les teves dades'}. Hem rebut les teves dades.</p>
           <p className="muted">El dia del lliurament, a la botiga, només caldrà revisar-les, comprovar la bicicleta i signar l'acta. Porta el teu DNI/NIE.</p>
+          <p className="muted">Després del lliurament podràs consultar la teva bicicleta i la documentació signada a <a href="/portal">el teu portal</a>, entrant amb aquest mateix correu.</p>
         </section>
       ) : (
         <form className="card" onSubmit={enviar} noValidate>
@@ -75,13 +78,13 @@ export function Inscripcio() {
             </label>
           </div>
 
-          <h2 className="mt">Protecció de dades</h2>
-          <div style={{ maxHeight: 220, overflow: 'auto', border: '1px solid var(--line)', borderRadius: 10, padding: '.8rem 1rem', background: '#fff', fontSize: '.88rem' }}>
-            {PRIVACITAT_TEXT.map((p, i) => <p key={i} style={{ margin: i ? '.6rem 0 0' : 0 }}>{p}</p>)}
+          <h2 className="mt">Política de privacitat i protecció de dades</h2>
+          <div style={{ maxHeight: 320, overflow: 'auto', border: '1px solid var(--line)', borderRadius: 10, padding: '.8rem 1rem', background: '#fff', fontSize: '.88rem', lineHeight: 1.45 }}>
+            <Seccions seccions={POLITICA_PRIVACITAT} />
           </div>
           <label className="check">
             <input type="checkbox" checked={privacitat} onChange={(e) => setPrivacitat(e.target.checked)} />
-            <span>He llegit i accepto la informació sobre protecció de dades. *</span>
+            <span>Accepto la política de privacitat. *</span>
           </label>
 
           {error ? <div className="alert error mt-s">{error}</div> : null}

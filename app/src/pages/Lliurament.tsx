@@ -2,6 +2,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Fotos, Steps } from '../components/Layout'
 import { SignaturePad } from '../components/SignaturePad'
+import { TextAnnexI, TextAnnexIII, TextDadesAjuntament } from '../components/Documentacio'
 import { ELEMENTS_PER_DEFECTE, ESTATS_ELEMENT, PROGRAMA, canalResum } from '../config'
 import { cercarBicis, cercarUsuariPerEmail, finalitzarLliurament, getCessio, llistarOrganitzacions } from '../lib/api'
 import { ara, identificacioBici, marcaModel } from '../lib/format'
@@ -36,7 +37,9 @@ const actaBuida = (): ActaLliurament => ({
   canal_incidencies: canalResum(),
   bici_marca_model: '',
   bici_identificacio: '',
-  elements: ELEMENTS_PER_DEFECTE.map((element) => ({ element, identificacio: '', estat: 'Correcte', conforme: true })),
+  elements: ELEMENTS_PER_DEFECTE.map((element) => ({
+    element, identificacio: /^cadireta/i.test(element) ? '2 unitats' : '', estat: 'Correcte', conforme: true,
+  })),
   observacions: '',
   num_fotos: 0,
   tecnic_nom: localStorage.getItem('vaic_tecnic_nom') ?? '',
@@ -163,6 +166,7 @@ export function Lliurament() {
       if (!a.signatures.benef) e.push('Signatura de la persona beneficiària')
       if (a.adult_nom.trim() && !a.signatures.adult) e.push("Signatura de l'adult autoritzat")
       if (!a.signatures.tecnic) e.push('Signatura del tècnic VAIC')
+      if (!a.documentacio_llegida_at) e.push('Confirmar la lectura de la documentació')
     }
     return e
   }, [pas, a, bici, clientId])
@@ -284,17 +288,15 @@ export function Lliurament() {
             <dt>Elements</dt><dd>{a.elements.map((e) => e.element).join(', ')}</dd>
             <dt>Fotos</dt><dd>{fotos.length}</dd>
           </dl>
-          <details className="manifest">
-            <summary>Manifestacions que accepta la persona beneficiària</summary>
-            <ul>
-              <li>Rep la bicicleta i els elements en estat aparent de funcionament correcte, llevat de les incidències consignades.</li>
-              <li>Ha realitzat la formació prèvia obligatòria prevista en el Reglament.</li>
-              <li>Ha rebut informació sobre l'assegurança i els canals de comunicació de sinistres.</li>
-              <li>Ha rebut les instruccions d'ús i seguretat i els límits de pes, càrrega i transport d'infants.</li>
-              <li>Ha rebut la informació sobre el tractament de dades personals.</li>
-              <li>Ha comprovat l'estat aparent de la bicicleta i dels accessoris i n'expressa la conformitat.</li>
-            </ul>
-          </details>
+          <h2 className="mt">Documentació per llegir abans de signar</h2>
+          <TextAnnexI obert />
+          <TextAnnexIII />
+          <TextDadesAjuntament />
+          <label className="check">
+            <input type="checkbox" checked={!!a.documentacio_llegida_at}
+              onChange={(e) => set('documentacio_llegida_at', e.target.checked ? new Date().toISOString() : undefined)} />
+            <span>La persona beneficiària (i, si escau, l'adult autoritzat) ha llegit les manifestacions de l'Annex I, el protocol d'incidències de l'Annex III i la informació sobre protecció de dades. *</span>
+          </label>
           <label className="mt">Tècnic VAIC: nom, cognoms i càrrec *
             <input value={a.tecnic_nom} onChange={(e) => set('tecnic_nom', e.target.value)} placeholder="Ex.: Jordi Puig – Mecànic" />
           </label>
