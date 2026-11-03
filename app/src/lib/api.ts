@@ -1,0 +1,177 @@
+import { BUCKET, supabase } from './supabase'
+import type { ActaLliurament, ActaRetorn, Bicicleta, Cessio, CessioActa, Organitzacio } from './types'
+
+const SELECT_CESSIO =
+  '*, bicicletes(id,codi,marca,model,num_bastidor,num_serie_bateria,codi_cadenat,tipus,color,estat), clients(empresa,nom,logo_url)'
+
+const ok = <T,>(r: { data: T | null; error: { message: string } | null }): T => {
+  if (r.error) throw new Error(r.error.message)
+  return r.data as T
+}
+
+export const refCessio = (c: Pick<Cessio, 'id'>) => 'CES-' + c.id.slice(0, 8).toUpperCase()
+
+export async function esAdmin(userId: string) {
+  const r = await supabase.from('user_roles').select('role').eq('user_id', userId)
+  return !!r.data?.some((x) => x.role === 'admin')
+}
+
+export async function llistarCessions(estat?: string) {
+  let q = supabase.from('cessions').select(SELECT_CESSIO).order('created_at', { ascending: false }).limit(200)
+  if (estat) q = q.eq('estat', estat)
+  return ok(await q) as Cessio[]
+}
+
+export async function getCessio(id: string) {
+  return ok(await supabase.from('cessions').select(SELECT_CESSIO).eq('id', id).single()) as Cessio
+}
+
+export async function getActes(cessioId: string) {
+  return ok(await supabase.from('cessio_actes').select('*').eq('cessio_id', cessioId)) as CessioActa[]
+}
+
+/** Darrera cessió d'aquest email, per omplir dades conegudes */
+export async function cercarUsuariPerEmail(email: string) {
+  const r = ok(
+    await supabase.from('cessions').select('id, usuari_nom, usuari_dni, usuari_telefon, client_id')
+      .ilike('usuari_email', email.trim()).order('created_at', { ascending: false }).limit(1),
+  ) as Pick<Cessio, 'id' | 'usuari_nom' | 'usuari_dni' | 'usuari_telefon' | 'client_id'>[]
+  if (!r.length) return null
+  const actes = await getActes(r[0].id)
+  const l = actes.find((a) => a.fase === 'lliurament')?.dades as ActaLliurament | undefined
+  return { ...r[0], escola_bressol: l?.escola_bressol, infant_unitat_familiar: l?.infant_unitat_familiar, adult_nom: l?.adult_nom }
+}
+
+/**
+ * Bicis que l'organització té en contracte actiu (contractes.bicicleta_id o contracte_bicicletes)
+ * i que no tenen cap cessió programada o activa. L'estat de la bici (assignada) no es toca mai:
+ * les cessions són una capa per sobre del contracte.
+ */
+export async function cercarBicis(
+  text: string, clientId: string | null, nomesPrograma: boolean, tipusPrograma: string[], excepteCessioId?: string | null,
+) {
+  if (!clientId) return [] as Bicicleta[]
+  const contractes = ok(
+    await supabase.from('contractes').select('id, bicicleta_id').eq('client_id', clientId).eq('estat', 'actiu'),
+  ) as { id: string; bicicleta_id: string | null }[]
+  if (!contractes.length) return [] as Bicicleta[]
+  const ids = new Set(contractes.map((c) => c.bicicleta_id).filter(Boolean) as string[])
+  const cb = ok(
+    await supabase.from('contracte_bicicletes').select('bicicleta_id').in('contracte_id', contractes.map((c) => c.id)),
+  ) as { bicicleta_id: string }[]
+  cb.forEach((x) => ids.add(x.bicicleta_id))
+  if (!ids.size) return [] as Bicicleta[]
+
+  const ocupades = ok(
+    await supabase.from('cessions').select('id, bicicleta_id').in('bicicleta_id', [...ids]).in('estat', ['programada', 'activa']),
+  ) as { id: string; bicicleta_id: string }[]
+  ocupades.filter((o) => o.id !== excepteCessioId).forEach((o) => ids.delete(o.bicicleta_id))
+  if (!ids.size) return [] as Bicicleta[]
+
+  let q = supabase.from('bicicletes')
+    .select('id,codi,marca,model,num_bastidor,num_serie_bateria,codi_cadenat,tipus,color,estat')
+    .in('id', [...ids]).not('estat', 'in', '(robada,venuda,fora_de_servei)').order('codi').limit(40)
+  if (text.trim()) {
+    const t = text.trim().replace(/[%,()]/g, '')
+    q = q.or(`codi.ilike.%${t}%,model.ilike.%${t}%,marca.ilike.%${t}%,num_bastidor.ilike.%${t}%`)
+  }
+  if (nomesPrograma) q = q.or(tipusPrograma.map((x) => `tipus.ilike.%${x}%`).join(','))
+  return ok(await q) as Bicicleta[]
+}
+
+export async function llistarOrganitzacions() {
+  const r = ok(
+    await supabase.from('clients').select('id, empresa, nom, cognoms, logo_url').eq('tipus', 'organitzacio').order('empresa'),
+  ) as { id: string; empresa: string | null; nom: string | null; cognoms: string | null; logo_url: string | null }[]
+  return r.map((c) => ({ id: c.id, nom: c.empresa || [c.nom, c.cognoms].filter(Boolean).join(' '), logo_url: c.logo_url })) as Organitzacio[]
+}
+
+async function pujar(path: string, file: Blob, contentType: string) {
+  ok(await supabase.storage.from(BUCKET).upload(path, file, { contentType, upsert: true }))
+  return path
+}
+
+async function pujarFotos(cessioId: string, fase: string, fotos: File[]) {
+  const paths: string[] = []
+  for (const [i, f] of fotos.entries()) {
+    const ext = (f.name.split('.').pop() || 'jpg').toLowerCase()
+    paths.push(await pujar(`${cessioId}/${fase}/foto-${i + 1}-${Date.now()}.${ext}`, f, f.type || 'image/jpeg'))
+  }
+  return paths
+}
+
+export async function urlSignada(path: string, descarregar?: string) {
+  const r = ok(await supabase.storage.from(BUCKET).createSignedUrl(path, 60 * 10, descarregar ? { download: descarregar } : undefined))
+  return r.signedUrl
+}
+
+/** Lliurament: crea (o actualitza una cessió programada), genera PDF + Word, desa-ho tot. No toca l'estat de la bici. */
+export async function finalitzarLliurament(params: {
+  cessioId?: string | null
+  clientId: string | null
+  bici: Bicicleta
+  acta: ActaLliurament
+  fotos: File[]
+}) {
+  const { acta, bici } = params
+  const camps = {
+    bicicleta_id: bici.id,
+    client_id: params.clientId,
+    usuari_nom: acta.beneficiaria_nom,
+    usuari_email: acta.beneficiaria_email.trim().toLowerCase(),
+    usuari_dni: acta.beneficiaria_document,
+    usuari_telefon: acta.beneficiaria_telefon,
+    data_inici: acta.lliurament_data_hora.slice(0, 10),
+    data_fi: acta.retorn_data_prevista || null,
+    check_in: new Date(acta.lliurament_data_hora).toISOString(),
+    estat: 'activa',
+    acta_cessio_signada: true,
+    signatura_cessio: acta.signatures.benef,
+    data_signatura_cessio: new Date().toISOString(),
+  }
+  const cessio = params.cessioId
+    ? (ok(await supabase.from('cessions').update(camps).eq('id', params.cessioId).select('id').single()) as { id: string })
+    : (ok(await supabase.from('cessions').insert(camps).select('id').single()) as { id: string })
+
+  const ref = refCessio(cessio)
+  const [{ pdfLliurament }, { generarWord }] = await Promise.all([import('./pdf'), import('./docx')])
+  const fotos = await pujarFotos(cessio.id, 'lliurament', params.fotos)
+  const final = { ...acta, num_fotos: params.fotos.length }
+  const [pdfBlob, wordBlob] = await Promise.all([pdfLliurament(final, ref), generarWord(final)])
+  const pdf_path = await pujar(`${cessio.id}/${ref}-acta-lliurament.pdf`, pdfBlob, 'application/pdf')
+  const docx_path = await pujar(`${cessio.id}/${ref}-annexos.docx`, wordBlob, wordBlob.type)
+
+  ok(await supabase.from('cessio_actes').upsert(
+    { cessio_id: cessio.id, fase: 'lliurament', dades: final, pdf_path, docx_path, fotos, signat_at: new Date().toISOString() },
+    { onConflict: 'cessio_id,fase' },
+  ))
+  return { cessioId: cessio.id, pdfBlob, wordBlob }
+}
+
+/** Retorn: genera Annex II, regenera el Word complet i tanca la cessió. No toca l'estat de la bici. */
+export async function finalitzarRetorn(params: {
+  cessio: Cessio; lliurament: ActaLliurament; acta: ActaRetorn; fotos: File[]
+}) {
+  const { cessio, lliurament, acta } = params
+  const ref = refCessio(cessio)
+  const [{ pdfRetorn }, { generarWord }] = await Promise.all([import('./pdf'), import('./docx')])
+  const fotos = await pujarFotos(cessio.id, 'retorn', params.fotos)
+  const final = { ...acta, num_fotos: params.fotos.length }
+  const [pdfBlob, wordBlob] = await Promise.all([pdfRetorn(lliurament, final, ref), generarWord(lliurament, final)])
+  const pdf_path = await pujar(`${cessio.id}/${ref}-acta-devolucio.pdf`, pdfBlob, 'application/pdf')
+  const docx_path = await pujar(`${cessio.id}/${ref}-annexos.docx`, wordBlob, wordBlob.type)
+
+  ok(await supabase.from('cessio_actes').upsert(
+    { cessio_id: cessio.id, fase: 'retorn', dades: final, pdf_path, docx_path, fotos, signat_at: new Date().toISOString() },
+    { onConflict: 'cessio_id,fase' },
+  ))
+  ok(await supabase.from('cessio_actes').update({ docx_path }).eq('cessio_id', cessio.id).eq('fase', 'lliurament'))
+  ok(await supabase.from('cessions').update({
+    estat: 'finalitzada',
+    check_out: new Date(acta.retorn_data_hora).toISOString(),
+    acta_retorn_signada: true,
+    signatura_retorn: acta.signatures.persona,
+    data_signatura_retorn: new Date().toISOString(),
+  }).eq('id', cessio.id))
+  return { pdfBlob, wordBlob }
+}
