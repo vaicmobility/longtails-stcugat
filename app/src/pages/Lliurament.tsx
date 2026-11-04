@@ -321,7 +321,7 @@ export function Lliurament() {
       {pas === 4 && (
         <section className="card">
           <h2>Generar l'acta</h2>
-          <p>Es crearà la cessió, es generarà l'acta de lliurament (PDF per imprimir) i el Word oficial, i quedaran desats a la base de dades. L'estat de la bicicleta i el contracte amb l'organització no es modifiquen.</p>
+          <p>Es crearà la cessió, es generarà l'acta de lliurament (PDF per imprimir) i quedarà tot desat a la base de dades. L'estat de la bicicleta i el contracte amb l'organització no es modifiquen.</p>
           {error ? <div className="alert error">{error}</div> : null}
           <button className="btn primary big" onClick={generar} disabled={desant}>{desant ? 'Generant i desant…' : 'Generar i desar acta'}</button>
         </section>
