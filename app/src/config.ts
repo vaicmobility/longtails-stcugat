@@ -3,15 +3,15 @@ export const PROGRAMA = {
   servei_gestor: 'Ajuntament de Sant Cugat del Vallès',
   empresa_nom: 'VAIC Mobility',
   lloc_lliurament: 'Botiga VAIC',
-  lloc_horari_retorn: 'Botiga VAIC · (horari a definir)',
+  lloc_horari_retorn: 'Botiga VAIC · De dilluns a divendres: de 10:00 a 14:00 i de 16:00 a 20:00',
   // Canal únic de comunicació i incidències. Els camps sense valor es mostren com a "—" als annexos.
   canal: {
     telefon: '936 75 45 70',
     whatsapp: '34634974051', // número internacional sense '+' (per a wa.me)
-    email: '—',
+    email: 'serveis@vaic.com',
     formulari: 'https://longtail.vaic.com',
-    horari: '—',
-    urgencies: '—',
+    horari: 'De dilluns a divendres: de 10:00 a 14:00 i de 16:00 a 20:00',
+    urgencies: '936 75 45 70',
   },
   // Filtre per defecte en cercar bicis disponibles
   tipus_bici_programa: ['longtail', 'cargo'],
