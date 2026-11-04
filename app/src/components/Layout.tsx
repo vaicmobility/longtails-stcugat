@@ -2,13 +2,14 @@ import type { ReactNode } from 'react'
 import { Link, NavLink } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './Auth'
+import { TitolPrograma } from './Marca'
 
 export function Layout({ children }: { children: ReactNode }) {
   const { session, admin } = useAuth()
   return (
     <div className="shell">
       <header className="topbar">
-        <Link to="/botiga" className="brand">VAIC <span>Cessions</span></Link>
+        <Link to="/botiga" style={{ textDecoration: 'none', maxWidth: 360 }}><TitolPrograma /></Link>
         <nav>
           <NavLink to="/botiga" end>Cessions</NavLink>
           <NavLink to="/botiga/preinscripcions">Preinscripcions</NavLink>
