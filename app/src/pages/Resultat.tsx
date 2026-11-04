@@ -1,11 +1,11 @@
 import { useEffect, useMemo } from 'react'
 
-type Props = { titol: string; text: string; pdfBlob: Blob; wordBlob: Blob; nomFitxer: string; onDetall: () => void }
+// El Word (plantilla de l'Ajuntament) es continua generant i desant internament, però no es mostra.
+type Props = { titol: string; text: string; pdfBlob: Blob; wordBlob?: Blob; nomFitxer: string; onDetall: () => void }
 
-export function Resultat({ titol, text, pdfBlob, wordBlob, nomFitxer, onDetall }: Props) {
+export function Resultat({ titol, text, pdfBlob, nomFitxer, onDetall }: Props) {
   const pdfUrl = useMemo(() => URL.createObjectURL(pdfBlob), [pdfBlob])
-  const wordUrl = useMemo(() => URL.createObjectURL(wordBlob), [wordBlob])
-  useEffect(() => () => { URL.revokeObjectURL(pdfUrl); URL.revokeObjectURL(wordUrl) }, [pdfUrl, wordUrl])
+  useEffect(() => () => URL.revokeObjectURL(pdfUrl), [pdfUrl])
 
   const imprimir = () => {
     const w = window.open(pdfUrl, '_blank')
@@ -18,11 +18,10 @@ export function Resultat({ titol, text, pdfBlob, wordBlob, nomFitxer, onDetall }
         <div className="done-icon">✓</div>
         <h1>{titol}</h1>
         <p>{text}</p>
-        <p className="muted">L'acta s'ha desat a la cessió (PDF i Word).</p>
+        <p className="muted">L'acta s'ha desat a la cessió.</p>
         <div className="actions">
           <button className="btn primary big" onClick={imprimir}>Imprimir / obrir PDF</button>
           <a className="btn big" href={pdfUrl} download={`${nomFitxer}.pdf`}>Descarregar PDF</a>
-          <a className="btn big" href={wordUrl} download={`${nomFitxer}.docx`}>Descarregar Word</a>
         </div>
         <button className="btn ghost" onClick={onDetall}>Veure la cessió</button>
       </section>
