@@ -15,10 +15,18 @@ export type Preinscripcio = {
   adult_nom: string | null
   adult_document: string | null
   privacitat_versio: string
-  privacitat_acceptada_at: string
+  privacitat_acceptada_at: string | null
   estat: 'pendent' | 'convertida' | 'descartada'
   cessio_id: string | null
   created_at: string
+  // Dades del llistat de l'Ajuntament (importació)
+  num_assignacio?: number | null
+  servei_gestor?: string | null
+  data_lliurament?: string | null
+  data_retorn_prevista?: string | null
+  lloc_lliurament?: string | null
+  lloc_retorn?: string | null
+  origen?: 'formulari' | 'importacio'
 }
 
 export type DadesPreinscripcio = {
