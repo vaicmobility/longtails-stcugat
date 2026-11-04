@@ -54,7 +54,7 @@ function Acces() {
   }
 
   return (
-    <form className="card" onSubmit={enviar} noValidate style={{ maxWidth: 480 }}>
+    <form className="card" onSubmit={enviar} noValidate style={{ maxWidth: 480, margin: '2rem auto' }}>
       <h1>La meva bicicleta</h1>
       {enviat ? (
         <>
