@@ -8,7 +8,11 @@ export type DocumentPrograma = {
   ordre: number
   visible: boolean
   updated_at: string
+  fitxer_path: string | null
+  fitxer_nom: string | null
 }
+
+const BUCKET_PROGRAMA = 'programa'
 
 const ok = <T,>(r: { data: T | null; error: { message: string } | null }): T => {
   if (r.error) throw new Error(r.error.message)
@@ -17,12 +21,15 @@ const ok = <T,>(r: { data: T | null; error: { message: string } | null }): T => 
 
 /** Admin: tots. Persones usuàries: només els visibles (ho garanteix la RLS). */
 export async function llistarDocuments() {
-  return ok(await supabase.from('programa_documents').select('id,titol,contingut_html,ordre,visible,updated_at')
+  return ok(await supabase.from('programa_documents').select('id,titol,contingut_html,ordre,visible,updated_at,fitxer_path,fitxer_nom')
     .order('ordre').order('created_at')) as DocumentPrograma[]
 }
 
 export async function desarDocument(d: Partial<DocumentPrograma> & { titol: string; contingut_html: string }) {
-  const camps = { titol: d.titol.trim(), contingut_html: netejarHtml(d.contingut_html), visible: d.visible ?? true, ordre: d.ordre ?? 0 }
+  const camps = {
+    titol: d.titol.trim(), contingut_html: netejarHtml(d.contingut_html), visible: d.visible ?? true, ordre: d.ordre ?? 0,
+    fitxer_path: d.fitxer_path ?? null, fitxer_nom: d.fitxer_nom ?? null,
+  }
   if (d.id) return ok(await supabase.from('programa_documents').update(camps).eq('id', d.id).select().single()) as DocumentPrograma
   return ok(await supabase.from('programa_documents').insert(camps).select().single()) as DocumentPrograma
 }
@@ -38,6 +45,37 @@ export async function esborrarDocument(id: string) {
 /** Desa l'ordre de la llista tal com es mostra (0, 1, 2…). */
 export async function desarOrdre(ids: string[]) {
   await Promise.all(ids.map((id, i) => supabase.from('programa_documents').update({ ordre: i }).eq('id', id).then(ok)))
+}
+
+// ---------------------------------------------------------------- PDF adjunt
+/** Puja un PDF al bucket privat `programa` (només admin) i en retorna la ruta i el nom original. */
+export async function pujarPdfDocument(fitxer: File) {
+  if (fitxer.type !== 'application/pdf' && !/\.pdf$/i.test(fitxer.name)) throw new Error('Només es poden adjuntar fitxers PDF.')
+  if (fitxer.size > 25 * 1024 * 1024) throw new Error('El PDF no pot superar els 25 MB.')
+  const path = `${crypto.randomUUID()}.pdf`
+  ok(await supabase.storage.from(BUCKET_PROGRAMA).upload(path, fitxer, { contentType: 'application/pdf' }))
+  return { fitxer_path: path, fitxer_nom: fitxer.name }
+}
+
+/** Obre (pestanya nova) o descarrega el PDF adjunt, amb la sessió de l'usuari. */
+export async function obrirPdfDocument(path: string, nom: string | null, descarregar = false) {
+  const finestra = descarregar ? null : window.open('', '_blank') // abans de l'await (bloqueig de popups)
+  try {
+    const { data: blob, error } = await supabase.storage.from(BUCKET_PROGRAMA).download(path)
+    if (error || !blob) throw new Error(error?.message || "No s'ha pogut obrir el PDF")
+    const url = URL.createObjectURL(new Blob([blob], { type: 'application/pdf' }))
+    if (finestra) finestra.location.href = url
+    else {
+      const a = document.createElement('a')
+      a.href = url
+      a.download = nom || 'document.pdf'
+      a.click()
+    }
+    setTimeout(() => URL.revokeObjectURL(url), 60_000)
+  } catch (e) {
+    finestra?.close()
+    throw e
+  }
 }
 
 // ---------------------------------------------------------------- HTML net
