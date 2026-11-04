@@ -34,7 +34,7 @@ export function Preinscripcions() {
     <div>
       <div className="page-head">
         <h1>Preinscripcions</h1>
-        <a className="btn" href="/inscripcio" target="_blank" rel="noreferrer">Obrir formulari públic ↗</a>
+        <a className="btn" href={`${import.meta.env.BASE_URL}inscripcio`} target="_blank" rel="noreferrer">Obrir formulari públic ↗</a>
       </div>
       <div className="toolbar">
         <div className="seg">
