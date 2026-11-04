@@ -180,7 +180,7 @@ export function Retorn() {
       {pas === 3 && (
         <section className="card">
           <h2>Generar l'acta de devolució</h2>
-          <p>Es generarà l'Annex II (PDF) i el Word complet de la cessió (Annex I + II). La cessió quedarà <strong>finalitzada</strong>.</p>
+          <p>Es generarà l'acta de devolució (Annex II, PDF). La cessió quedarà <strong>finalitzada</strong>.</p>
           {error ? <div className="alert error">{error}</div> : null}
           <button className="btn primary big" onClick={generar} disabled={desant}>{desant ? 'Generant i desant…' : 'Generar i desar acta'}</button>
         </section>
