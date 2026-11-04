@@ -23,6 +23,11 @@ export function Seccions({ seccions }: { seccions: Seccio[] }) {
   )
 }
 
+/** Text amb les URL convertides en enllaços. */
+export function AmbEnllacos({ text }: { text: string }) {
+  return <>{text.split(/(https?:\/\/[^\s,]+)/g).map((t, i) => (i % 2 ? <a key={i} href={t} target="_blank" rel="noreferrer">{t}</a> : t))}</>
+}
+
 /** Bloc desplegable amb un text íntegre per llegir. */
 export function Text({ titol, obert, children }: { titol: string; obert?: boolean; children: ReactNode }) {
   return (
@@ -39,7 +44,14 @@ export const TextPrivacitat = ({ obert }: { obert?: boolean }) => (
 
 export const TextAnnexI = ({ obert }: { obert?: boolean }) => (
   <Text titol="Annex I · Manifestacions de l'acta de lliurament" obert={obert}>
-    <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>{ANNEX_I_MANIFESTACIONS.map((t, i) => <li key={i} style={{ marginBottom: '.4rem' }}>{t}</li>)}</ul>
+    <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
+      {ANNEX_I_MANIFESTACIONS.map((m, i) => (
+        <li key={i} style={{ marginBottom: '.5rem' }}>
+          {m.text}
+          {m.detalls?.map((d, j) => <p key={j} style={{ margin: '.3rem 0 0' }}><AmbEnllacos text={d} /></p>)}
+        </li>
+      ))}
+    </ul>
   </Text>
 )
 
