@@ -1,0 +1,53 @@
+# Publica l'app a GitHub Pages a cada canvi a main.
+# Settings → Pages → Source: "GitHub Actions".
+name: Desplega a GitHub Pages
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: app/package-lock.json
+      - name: Instal·la dependències
+        working-directory: app
+        run: npm ci
+      - name: Compila
+        working-directory: app
+        env:
+          # Amb domini propi (p. ex. longtail.vaic.com) cal canviar-ho a "/"
+          BASE_PATH: /longtails-stcugat/
+        run: |
+          cp .env.example .env
+          npm run build
+          cp dist/index.html dist/404.html
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: app/dist
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4
