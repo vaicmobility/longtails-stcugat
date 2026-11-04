@@ -99,12 +99,6 @@ export function Detall() {
               <button className="btn small" onClick={() => obrir(r.pdf_path)}>PDF</button>
             </div>
           ) : null}
-          {(r ?? l)?.docx_path ? (
-            <div className="doc">
-              <div><strong>Word oficial (annexos)</strong><div className="muted small">Format de l'Ajuntament</div></div>
-              <button className="btn small" onClick={() => obrir((r ?? l)!.docx_path, `annexos-${refCessio(c)}.docx`)}>Word</button>
-            </div>
-          ) : null}
         </div>
         {[...(l?.fotos ?? []), ...(r?.fotos ?? [])].length ? (
           <>
