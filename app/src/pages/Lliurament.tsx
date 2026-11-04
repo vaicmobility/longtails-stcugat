@@ -3,6 +3,7 @@ import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Fotos, Steps } from '../components/Layout'
 import { SignaturePad } from '../components/SignaturePad'
 import { TextAnnexI, TextAnnexIII, TextDadesAjuntament } from '../components/Documentacio'
+import { DocumentacioPrograma } from '../components/DocumentacioPrograma'
 import { ELEMENTS_PER_DEFECTE, ESTATS_ELEMENT, PROGRAMA, canalResum } from '../config'
 import { cercarBicis, cercarUsuariPerEmail, finalitzarLliurament, getCessio, llistarOrganitzacions } from '../lib/api'
 import { ara, identificacioBici, marcaModel } from '../lib/format'
@@ -294,13 +295,11 @@ export function Lliurament() {
             <dt>Fotos</dt><dd>{fotos.length}</dd>
           </dl>
           <h2 className="mt">Documentació per llegir abans de signar</h2>
-          <TextAnnexI obert />
-          <TextAnnexIII />
-          <TextDadesAjuntament />
+          <DocumentacioPrograma obrirPrimer perDefecte={<><TextAnnexI obert /><TextAnnexIII /><TextDadesAjuntament /></>} />
           <label className="check">
             <input type="checkbox" checked={!!a.documentacio_llegida_at}
               onChange={(e) => set('documentacio_llegida_at', e.target.checked ? new Date().toISOString() : undefined)} />
-            <span>La persona beneficiària (i, si escau, l'adult autoritzat) ha llegit les manifestacions de l'Annex I, el protocol d'incidències de l'Annex III i la informació sobre protecció de dades. *</span>
+            <span>La persona beneficiària (i, si escau, l'adult autoritzat) ha llegit la documentació del programa que es mostra a dalt. *</span>
           </label>
           <label className="mt">Tècnic VAIC: nom, cognoms i càrrec *
             <input value={a.tecnic_nom} onChange={(e) => set('tecnic_nom', e.target.value)} placeholder="Ex.: Jordi Puig – Mecànic" />
