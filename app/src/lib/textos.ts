@@ -19,15 +19,14 @@ export const ANNEX_I_MANIFESTACIONS: Manifestacio[] = [
   {
     text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut informació sobre els itineraris ciclables del municipi accessibles a través del Geoportal municipal i es compromet a prioritzar, sempre que sigui possible, itineraris segurs, xarxa ciclable existent, vies pacificades i recorreguts amb baixa intensitat de trànsit, especialment quan transportin infants.",
     detalls: [
-      "Enllaç al “geoportal” de l’Ajuntament de Sant Cugat del Vallès: https://geociutat.santcugat.cat/geoportal,",
-      "05. Mobilitat i transport, carrils bici.",
+      "Enllaç al “geoportal” de l’Ajuntament de Sant Cugat del Vallès: https://geociutat.santcugat.cat/geoportal, 05. Mobilitat i transport, carrils bici.",
     ],
   },
   {
     text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren conèixer i aplicar la normativa aplicable a la circulació de bicicletes al municipi.",
     detalls: [
       "Resulta especialment rellevant el text refós de la Llei sobre trànsit, circulació de vehicles de motor i seguretat viària, el Reglament general de circulació i la modificació reglamentària introduïda pel Reial decret 518/2026, de 24 de juny.",
-      "També resulta rellevant el coneixement de l’ordenança municipal que regula la circulació de bicicletes",
+      "També resulta rellevant el coneixement de l’ordenança municipal que regula la circulació de bicicletes.",
       "Entre altres, resulta especialment destacable el compromís de la persona beneficiaria de respectar l’article 118 del Reglament general de circulació que exigeix que els menors de setze anys que viatgen en bicicleta duguin un casc de protecció homologat o certificat i correctament cordat en qualsevol tipus de via.",
       "Enllaç al document de l’ordenança municipal al web de l’Ajuntament de Sant Cugat del Vallès: https://santcugat.cat/web/ordenanca-bici-vmp",
     ],
