@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../components/Auth'
+import { CapcaleraPublica } from '../components/Marca'
 import { TextAnnexI, TextAnnexII, TextAnnexIII, TextDadesAjuntament, TextPrivacitat } from '../components/Documentacio'
 import { PROGRAMA } from '../config'
 import { obrirFitxer } from '../lib/fitxers'
@@ -19,16 +20,14 @@ export function Portal() {
   if (carregant) return <div className="center muted">Carregant…</div>
   return (
     <div className="content" style={{ maxWidth: 820 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1rem 0 1.2rem', flexWrap: 'wrap' }}>
-        <img src="/assets/logo-santcugat.png" alt="Ajuntament de Sant Cugat" style={{ height: 48 }} />
-        <div className="brand">VAIC <span>Mobility</span></div>
+      <CapcaleraPublica>
         {session ? (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '.6rem', alignItems: 'center' }}>
             <span className="muted small">{session.user.email}</span>
             <button className="btn ghost small" onClick={() => supabase.auth.signOut()}>Sortir</button>
           </div>
         ) : null}
-      </div>
+      </CapcaleraPublica>
       {session ? <LesMevesCessions email={session.user.email ?? ''} /> : <Acces />}
     </div>
   )
