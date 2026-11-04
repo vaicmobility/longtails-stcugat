@@ -100,7 +100,7 @@ export function Lliurament() {
   }, [])
 
   useEffect(() => {
-    if (preinsId && !clientId && orgs.length) setClientId(orgPrograma())
+    if (!clientId && orgs.length) setClientId(orgPrograma() ?? orgs[0].id)
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [preinsId, orgs])
 
