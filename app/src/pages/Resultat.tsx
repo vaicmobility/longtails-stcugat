@@ -1,7 +1,6 @@
 import { useEffect, useMemo } from 'react'
 
-// El Word (plantilla de l'Ajuntament) es continua generant i desant internament, però no es mostra.
-type Props = { titol: string; text: string; pdfBlob: Blob; wordBlob?: Blob; nomFitxer: string; onDetall: () => void }
+type Props = { titol: string; text: string; pdfBlob: Blob; nomFitxer: string; onDetall: () => void }
 
 export function Resultat({ titol, text, pdfBlob, nomFitxer, onDetall }: Props) {
   const pdfUrl = useMemo(() => URL.createObjectURL(pdfBlob), [pdfBlob])
