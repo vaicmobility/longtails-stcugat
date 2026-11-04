@@ -1,4 +1,5 @@
 import { generarWord } from './docx'
+import { carregarReglament } from './documents'
 import { pdfLliurament, pdfRetorn } from './pdf'
 import { BUCKET, supabase } from './supabase'
 import type { ActaLliurament, ActaRetorn, Bicicleta, Cessio, CessioActa, Organitzacio } from './types'
@@ -158,7 +159,8 @@ export async function finalitzarLliurament(params: {
   const cessio = { id: params.cessioId ?? crypto.randomUUID() }
   const ref = refCessio(cessio)
   const final = { ...acta, num_fotos: params.fotos.length }
-  const [pdfBlob, wordBlob] = await Promise.all([pdfLliurament(final, ref), generarWord(final)])
+  const reglament = await carregarReglament() // el Reglament s'imprimeix davant de l'Annex I
+  const [pdfBlob, wordBlob] = await Promise.all([pdfLliurament(final, ref, reglament), generarWord(final)])
 
   // 2) Després es desa la cessió (insereix o actualitza), les fotos, els fitxers i l'acta.
   ok(await supabase.from('cessions').upsert({ id: cessio.id, ...camps }, { onConflict: 'id' }).select('id').single())
