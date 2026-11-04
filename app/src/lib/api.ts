@@ -1,3 +1,5 @@
+import { generarWord } from './docx'
+import { pdfLliurament, pdfRetorn } from './pdf'
 import { BUCKET, supabase } from './supabase'
 import type { ActaLliurament, ActaRetorn, Bicicleta, Cessio, CessioActa, Organitzacio } from './types'
 
@@ -124,15 +126,17 @@ export async function finalitzarLliurament(params: {
     signatura_cessio: acta.signatures.benef,
     data_signatura_cessio: new Date().toISOString(),
   }
-  const cessio = params.cessioId
-    ? (ok(await supabase.from('cessions').update(camps).eq('id', params.cessioId).select('id').single()) as { id: string })
-    : (ok(await supabase.from('cessions').insert(camps).select('id').single()) as { id: string })
-
+  // 1) Primer es generen els documents (si falla, no s'ha escrit res a la base de dades).
+  //    L'id de la cessió ve donat (cessió programada o id nou generat a la pantalla), de manera
+  //    que si cal reintentar s'actualitza la mateixa cessió en lloc de crear-ne una altra.
+  const cessio = { id: params.cessioId ?? crypto.randomUUID() }
   const ref = refCessio(cessio)
-  const [{ pdfLliurament }, { generarWord }] = await Promise.all([import('./pdf'), import('./docx')])
-  const fotos = await pujarFotos(cessio.id, 'lliurament', params.fotos)
   const final = { ...acta, num_fotos: params.fotos.length }
   const [pdfBlob, wordBlob] = await Promise.all([pdfLliurament(final, ref), generarWord(final)])
+
+  // 2) Després es desa la cessió (insereix o actualitza), les fotos, els fitxers i l'acta.
+  ok(await supabase.from('cessions').upsert({ id: cessio.id, ...camps }, { onConflict: 'id' }).select('id').single())
+  const fotos = await pujarFotos(cessio.id, 'lliurament', params.fotos)
   const pdf_path = await pujar(`${cessio.id}/${ref}-acta-lliurament.pdf`, pdfBlob, 'application/pdf')
   const docx_path = await pujar(`${cessio.id}/${ref}-annexos.docx`, wordBlob, wordBlob.type)
 
@@ -149,7 +153,6 @@ export async function finalitzarRetorn(params: {
 }) {
   const { cessio, lliurament, acta } = params
   const ref = refCessio(cessio)
-  const [{ pdfRetorn }, { generarWord }] = await Promise.all([import('./pdf'), import('./docx')])
   const fotos = await pujarFotos(cessio.id, 'retorn', params.fotos)
   const final = { ...acta, num_fotos: params.fotos.length }
   const [pdfBlob, wordBlob] = await Promise.all([pdfRetorn(lliurament, final, ref), generarWord(lliurament, final)])
