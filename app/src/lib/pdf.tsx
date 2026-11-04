@@ -3,6 +3,7 @@ import { Document, Font, Image, Line, Link, Page, StyleSheet, Svg, Text, View, p
 import type { ReactNode } from 'react'
 import { PROGRAMA } from '../config'
 import { data, dataHora } from './format'
+import type { Reglament } from './documents'
 import { ANNEX_I_MANIFESTACIONS } from './textos'
 import type { ActaLliurament, ActaRetorn } from './types'
 
@@ -132,6 +133,24 @@ const Box2 = ({ si }: { si: boolean }) => (
     <Text>Fotografies incorporades a l'acta:  </Text>
     <Box on={si} /><Text>Sí   </Text><Box on={!si} /><Text>No</Text>
   </View>
+)
+
+// ---------------------------------------------------------------- Reglament (davant de l'Annex I)
+const PaginesReglament = ({ r, refDoc }: { r: Reglament; refDoc: string }) => (
+  <Page size="A4" style={s.page}>
+    <Header />
+    <Footer refDoc={refDoc} />
+    <Text style={[s.h1, { textAlign: 'center', fontSize: 10, marginBottom: 12 }]}>{r.titol}</Text>
+    {r.blocs.map((b, i) =>
+      b.tipus === 'capitol' ? (
+        <Text key={i} style={[s.h1, { marginTop: 10, marginBottom: 4 }]} minPresenceAhead={50}>{b.text}</Text>
+      ) : b.tipus === 'article' ? (
+        <Text key={i} style={[s.h2, { marginTop: 7, marginBottom: 3 }]} minPresenceAhead={40}>{b.text}</Text>
+      ) : (
+        <Text key={i} style={/^[a-z]\) /.test(b.text) ? [s.p, { marginLeft: 10, marginBottom: 2 }] : s.p}>{b.text}</Text>
+      ),
+    )}
+  </Page>
 )
 
 // ---------------------------------------------------------------- Annex I
@@ -319,9 +338,11 @@ const AnnexIII = ({ refDoc }: { refDoc: string }) => (
   </Page>
 )
 
-export const pdfLliurament = (a: ActaLliurament, refDoc: string) =>
+/** Acta de lliurament: Reglament (si es passa) + Annex I + Annex III. */
+export const pdfLliurament = (a: ActaLliurament, refDoc: string, reglament?: Reglament | null) =>
   pdf(
     <Document title={`Acta de lliurament ${refDoc}`} author={PROGRAMA.empresa_nom} language="ca">
+      {reglament ? <PaginesReglament r={reglament} refDoc={refDoc} /> : null}
       <AnnexI a={a} refDoc={refDoc} />
       <AnnexIII refDoc={refDoc} />
     </Document>,
