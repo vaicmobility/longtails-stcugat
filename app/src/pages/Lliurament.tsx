@@ -61,7 +61,7 @@ export function Lliurament() {
   const [avis, setAvis] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [desant, setDesant] = useState(false)
-  const [resultat, setResultat] = useState<{ cessioId: string; pdfBlob: Blob; wordBlob: Blob } | null>(null)
+  const [resultat, setResultat] = useState<{ cessioId: string; pdfBlob: Blob } | null>(null)
   const idNou = useRef(crypto.randomUUID()) // id estable: els reintents no dupliquen la cessió
 
   const set = <K extends keyof ActaLliurament>(k: K, v: ActaLliurament[K]) => setA((x) => ({ ...x, [k]: v }))
@@ -198,7 +198,7 @@ export function Lliurament() {
   if (resultat)
     return (
       <Resultat titol="Lliurament completat" text={`La bicicleta ${bici?.codi ?? ''} queda cedida a ${a.beneficiaria_nom}.`}
-        pdfBlob={resultat.pdfBlob} wordBlob={resultat.wordBlob} nomFitxer={`acta-lliurament-${bici?.codi ?? ''}`}
+        pdfBlob={resultat.pdfBlob} nomFitxer={`acta-lliurament-${bici?.codi ?? ''}`}
         onDetall={() => nav(`/botiga/cessio/${resultat.cessioId}`)} />
     )
 
