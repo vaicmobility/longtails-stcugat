@@ -14,13 +14,13 @@ export function TitolPrograma({ gran }: { gran?: boolean }) {
   )
 }
 
-/** Capçalera de les pàgines públiques (preinscripció i portal). */
+/** Capçalera de les pàgines públiques (preinscripció i portal): títol centrat, sense logo. */
 export function CapcaleraPublica({ children }: { children?: React.ReactNode }) {
   return (
-    <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1rem 0 1.2rem', flexWrap: 'wrap' }}>
-      <img src={LOGO_AJUNTAMENT} alt="Ajuntament de Sant Cugat" style={{ height: 44, width: 'auto' }} />
-      <TitolPrograma />
-      {children}
-    </div>
+    <header style={{ textAlign: 'center', padding: '2rem 0 1.4rem', margin: '0 0 1.4rem', borderBottom: '1px solid var(--line)' }}>
+      <div style={{ fontWeight: 800, color: 'var(--accent)', fontSize: 'clamp(1.35rem, 4vw, 1.8rem)', lineHeight: 1.15, letterSpacing: '-.01em' }}>{TITOL_PROGRAMA}</div>
+      <div className="muted" style={{ fontSize: 'clamp(.88rem, 2.4vw, 1rem)', marginTop: '.35rem' }}>{SUBTITOL_PROGRAMA}</div>
+      {children ? <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '.6rem', marginTop: '.9rem', flexWrap: 'wrap' }}>{children}</div> : null}
+    </header>
   )
 }
