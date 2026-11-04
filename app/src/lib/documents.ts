@@ -47,6 +47,34 @@ export async function desarOrdre(ids: string[]) {
   await Promise.all(ids.map((id, i) => supabase.from('programa_documents').update({ ordre: i }).eq('id', id).then(ok)))
 }
 
+// ---------------------------------------------------------------- Reglament (s'imprimeix a l'acta de lliurament)
+/** Text del Reglament a la Documentació. Es fa servir per imprimir-lo al PDF de l'acta, davant de l'Annex I. */
+export const ID_REGLAMENT = '5e9a1c00-0000-4000-8000-00000000a001'
+
+export type BlocReglament = { tipus: 'capitol' | 'article' | 'paragraf'; text: string }
+export type Reglament = { titol: string; blocs: BlocReglament[] }
+
+export async function carregarReglament(): Promise<Reglament> {
+  const r = await supabase.from('programa_documents').select('titol, contingut_html').eq('id', ID_REGLAMENT).maybeSingle()
+  if (r.error || !r.data?.contingut_html) throw new Error("No s'ha pogut carregar el text del Reglament per a l'acta. Torna-ho a provar.")
+  const doc = new DOMParser().parseFromString(`<body>${r.data.contingut_html}</body>`, 'text/html')
+  const blocs: BlocReglament[] = []
+  const net = (t: string | null) => (t ?? '').replace(/\s+/g, ' ').trim()
+  doc.body.childNodes.forEach((n) => {
+    if (n.nodeType !== Node.ELEMENT_NODE) return
+    const el = n as Element
+    const tag = el.tagName.toUpperCase()
+    if (tag === 'UL' || tag === 'OL') {
+      el.querySelectorAll(':scope > li').forEach((li, i) => blocs.push({ tipus: 'paragraf', text: (tag === 'OL' ? `${i + 1}. ` : '• ') + net(li.textContent) }))
+      return
+    }
+    const text = net(el.textContent)
+    if (!text) return
+    blocs.push({ tipus: tag === 'H3' ? 'capitol' : tag === 'H4' ? 'article' : 'paragraf', text })
+  })
+  return { titol: r.data.titol, blocs }
+}
+
 // ---------------------------------------------------------------- PDF adjunt
 /** Puja un PDF al bucket privat `programa` (només admin) i en retorna la ruta i el nom original. */
 export async function pujarPdfDocument(fitxer: File) {
