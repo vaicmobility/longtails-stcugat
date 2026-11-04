@@ -1,9 +1,13 @@
 // PDF de les actes (Annex I i II) generat a partir de les dades. Format proper al Word oficial.
-import { Document, Image, Line, Page, StyleSheet, Svg, Text, View, pdf } from '@react-pdf/renderer'
+import { Document, Font, Image, Line, Link, Page, StyleSheet, Svg, Text, View, pdf } from '@react-pdf/renderer'
 import type { ReactNode } from 'react'
 import { PROGRAMA } from '../config'
 import { data, dataHora } from './format'
+import { ANNEX_I_MANIFESTACIONS } from './textos'
 import type { ActaLliurament, ActaRetorn } from './types'
+
+// Sense partició automàtica de paraules: evita talls incorrectes en català i en les URL (enllaços trencats).
+Font.registerHyphenationCallback((paraula) => [paraula])
 
 const LABEL_BG = '#ececec'
 const HEAD_BG = '#d9e2f3'
@@ -61,6 +65,11 @@ const Footer = ({ refDoc }: { refDoc: string }) => (
 )
 
 // Casella dibuixada amb vectors (un text "X" dins d'una caixa tan petita queda retallat i no es veu).
+/** Converteix les URL en enllaços clicables dins del PDF. */
+const TextAmbEnllacos = ({ text }: { text: string }) => (
+  <>{text.split(/(https?:\/\/[^\s,]+)/g).map((t, i) => (i % 2 ? <Link key={i} src={t} style={{ color: '#1f4e9c' }}>{t}</Link> : t))}</>
+)
+
 const Box = ({ on }: { on: boolean }) => (
   <View style={s.box}>
     {on ? (
@@ -164,17 +173,14 @@ const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
       <Text style={[s.cell, { minHeight: 34 }]}>{a.observacions || ' '}</Text>
     </View>
 
-    <View wrap={false}>
-      <Text style={s.h2}>Manifestacions</Text>
-      {[
-        "La persona beneficiària declara que rep la bicicleta i els elements materials associats en estat aparent de funcionament correcte, llevat de les incidències que consten expressament en aquesta acta.",
-        "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver realitzat la formació prèvia obligatòria prevista en el Reglament.",
-        "La persona beneficiària declara haver rebut informació sobre l'abast i les condicions bàsiques de l'assegurança, així com sobre els canals i els terminis de comunicació dels sinistres.",
-        "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut les instruccions d'ús i seguretat de la bicicleta, així com informació sobre els límits de pes, càrrega, ocupació i transport d'infants aplicables al model assignat.",
-        "La persona beneficiària declara haver rebut la informació relativa al tractament de les dades personals vinculades a la gestió del programa i haver estat informada sobre el responsable del tractament, la finalitat, la base jurídica, els destinataris, el termini de conservació i l'exercici dels seus drets.",
-        "La persona beneficiària declara haver comprovat l'estat aparent de la bicicleta i dels accessoris lliurats i manifesta la seva conformitat, llevat de les observacions expressament consignades en aquesta acta.",
-      ].map((t, i) => <Text key={i} style={s.p}>• {t}</Text>)}
-    </View>
+    {/* Manifestacions (Reglament definitiu). Cada punt es manté sencer a la mateixa pàgina. */}
+    <Text style={s.h2} minPresenceAhead={60}>Manifestacions</Text>
+    {ANNEX_I_MANIFESTACIONS.map((m, i) => (
+      <View key={i} wrap={false} style={{ marginBottom: 2 }}>
+        <Text style={s.p}>• {m.text}</Text>
+        {m.detalls?.map((d, j) => <Text key={j} style={[s.p, { marginLeft: 8 }]}><TextAmbEnllacos text={d} /></Text>)}
+      </View>
+    ))}
 
     <View wrap={false} style={{ marginTop: 10 }}>
       <View style={[s.row, { borderTop: `0.6pt solid ${BORDER}`, borderLeft: `0.6pt solid ${BORDER}` }]}>
