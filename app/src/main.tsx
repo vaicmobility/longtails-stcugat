@@ -23,7 +23,7 @@ const NomesAdmin = ({ children }: { children: React.ReactNode }) => (
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
-      <BrowserRouter>
+      <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || '/'}>
         <Routes>
           <Route path="/" element={<Navigate to="/botiga" replace />} />
           <Route path="/botiga" element={<Botiga><Cessions /></Botiga>} />
