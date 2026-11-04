@@ -28,6 +28,7 @@ export function Preinscripcions() {
   const t = text.trim().toLowerCase()
   const visibles = (llista ?? []).filter((p) =>
     !t || [p.nom, p.email, p.document, p.escola_bressol].some((x) => x?.toLowerCase().includes(t)))
+    .sort((a, b) => (a.num_assignacio ?? 1e9) - (b.num_assignacio ?? 1e9))
 
   return (
     <div>
@@ -48,7 +49,7 @@ export function Preinscripcions() {
         {visibles.map((p) => (
           <div className="row card" key={p.id}>
             <div className="row-main">
-              <div className="row-title">{p.nom}</div>
+              <div className="row-title">{p.num_assignacio ? `${p.num_assignacio}. ` : ''}{p.nom}</div>
               <div className="muted small">
                 {p.email} · {p.document}{p.telefon ? ` · ${p.telefon}` : ''}
                 {p.escola_bressol ? ` · ${p.escola_bressol}` : ''} · {data(p.created_at)}

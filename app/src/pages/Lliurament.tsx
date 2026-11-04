@@ -83,8 +83,12 @@ export function Lliurament() {
       infant_unitat_familiar: p.infant_unitat_familiar ?? x.infant_unitat_familiar,
       adult_nom: p.adult_nom ?? x.adult_nom,
       adult_document: p.adult_document ?? x.adult_document,
+      servei_gestor: p.servei_gestor ?? x.servei_gestor,
+      retorn_data_prevista: p.data_retorn_prevista ?? x.retorn_data_prevista,
+      lliurament_lloc: p.lloc_lliurament ?? x.lliurament_lloc,
+      retorn_lloc_horari: p.lloc_retorn ?? x.retorn_lloc_horari,
     }))
-    setAvis(`Dades de la preinscripció del ${new Date(p.created_at).toLocaleDateString('ca-ES')}. Revisa-les amb la persona.`)
+    setAvis(`${p.num_assignacio ? `Assignació núm. ${p.num_assignacio} · ` : ''}Dades de la preinscripció del ${new Date(p.created_at).toLocaleDateString('ca-ES')}. Revisa-les amb la persona.`)
   }
 
   useEffect(() => {
