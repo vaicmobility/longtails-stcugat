@@ -6,7 +6,7 @@ export function EditorText({ valor, onChange }: { valor: string; onChange: (html
   const ref = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
-    if (ref.current && ref.current.innerHTML !== valor) ref.current.innerHTML = valor
+    if (ref.current) ref.current.innerHTML = netejarHtml(valor) // mai s'injecta HTML sense netejar
     // només en carregar un altre text
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
