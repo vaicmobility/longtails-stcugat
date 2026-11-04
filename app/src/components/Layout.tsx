@@ -16,6 +16,7 @@ export function Layout({ children }: { children: ReactNode }) {
           {admin ? <NavLink to="/botiga/nova" className="btn primary small">+ Nou lliurament</NavLink> : <span className="pill">Mode consulta</span>}
         </nav>
         <div className="user">
+          {admin ? <NavLink to="/botiga/documentacio" className="btn ghost small" title="Textos del programa que es mostren al portal">Documentació</NavLink> : null}
           <span className="muted">{session?.user.email}</span>
           <button className="btn ghost small" onClick={() => supabase.auth.signOut()}>Sortir</button>
         </div>
