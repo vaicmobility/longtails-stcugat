@@ -18,14 +18,35 @@ export async function esAdmin(userId: string) {
   return !!r.data?.some((x) => x.role === 'admin')
 }
 
+/**
+ * Aquesta app només treballa amb el programa de l'Ajuntament de Sant Cugat. La taula `cessions`
+ * és compartida amb el portal VAIC Renting, així que tot es filtra per aquesta organització.
+ */
+let _idPrograma: Promise<string | null> | null = null
+export function idOrganitzacioPrograma() {
+  _idPrograma ??= (async () => {
+    const r = ok(
+      await supabase.from('clients').select('id').eq('tipus', 'organitzacio')
+        .ilike('empresa', 'Ajuntament de Sant Cugat%').order('created_at').limit(1),
+    ) as { id: string }[]
+    return r[0]?.id ?? null
+  })().catch((e) => { _idPrograma = null; throw e })
+  return _idPrograma
+}
+
 export async function llistarCessions(estat?: string) {
-  let q = supabase.from('cessions').select(SELECT_CESSIO).order('created_at', { ascending: false }).limit(200)
+  const org = await idOrganitzacioPrograma()
+  if (!org) return [] as Cessio[]
+  let q = supabase.from('cessions').select(SELECT_CESSIO).eq('client_id', org).order('created_at', { ascending: false }).limit(200)
   if (estat) q = q.eq('estat', estat)
   return ok(await q) as Cessio[]
 }
 
 export async function getCessio(id: string) {
-  return ok(await supabase.from('cessions').select(SELECT_CESSIO).eq('id', id).single()) as Cessio
+  const org = await idOrganitzacioPrograma()
+  const r = ok(await supabase.from('cessions').select(SELECT_CESSIO).eq('id', id).eq('client_id', org ?? '').maybeSingle()) as Cessio | null
+  if (!r) throw new Error("Aquesta cessió no és del programa de l'Ajuntament de Sant Cugat.")
+  return r
 }
 
 export async function getActes(cessioId: string) {
@@ -34,9 +55,11 @@ export async function getActes(cessioId: string) {
 
 /** Darrera cessió d'aquest email, per omplir dades conegudes */
 export async function cercarUsuariPerEmail(email: string) {
+  const org = await idOrganitzacioPrograma()
+  if (!org) return null
   const r = ok(
     await supabase.from('cessions').select('id, usuari_nom, usuari_dni, usuari_telefon, client_id')
-      .ilike('usuari_email', email.trim()).order('created_at', { ascending: false }).limit(1),
+      .eq('client_id', org).ilike('usuari_email', email.trim()).order('created_at', { ascending: false }).limit(1),
   ) as Pick<Cessio, 'id' | 'usuari_nom' | 'usuari_dni' | 'usuari_telefon' | 'client_id'>[]
   if (!r.length) return null
   const actes = await getActes(r[0].id)
@@ -81,9 +104,12 @@ export async function cercarBicis(
   return ok(await q) as Bicicleta[]
 }
 
+/** Només l'organització del programa (Ajuntament de Sant Cugat). */
 export async function llistarOrganitzacions() {
+  const org = await idOrganitzacioPrograma()
+  if (!org) return [] as Organitzacio[]
   const r = ok(
-    await supabase.from('clients').select('id, empresa, nom, cognoms, logo_url').eq('tipus', 'organitzacio').order('empresa'),
+    await supabase.from('clients').select('id, empresa, nom, cognoms, logo_url').eq('id', org),
   ) as { id: string; empresa: string | null; nom: string | null; cognoms: string | null; logo_url: string | null }[]
   return r.map((c) => ({ id: c.id, nom: c.empresa || [c.nom, c.cognoms].filter(Boolean).join(' '), logo_url: c.logo_url })) as Organitzacio[]
 }
