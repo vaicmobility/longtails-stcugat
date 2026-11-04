@@ -149,3 +149,13 @@ textarea { resize: vertical; }
   .steps .txt { display: none; }
   .list .row { flex-wrap: wrap; }
 }
+
+/* Textos del programa amb format (editor i portal) */
+.text-doc { line-height: 1.5; }
+.text-doc > :first-child { margin-top: 0; }
+.text-doc h3 { font-size: 1.05rem; margin: 1rem 0 .4rem; }
+.text-doc h4 { font-size: .95rem; margin: .8rem 0 .3rem; }
+.text-doc p { margin: .4rem 0; }
+.text-doc ul, .text-doc ol { margin: .4rem 0; padding-left: 1.3rem; }
+.text-doc li { margin-bottom: .25rem; }
+.text-doc blockquote { margin: .5rem 0; padding-left: .8rem; border-left: 3px solid var(--line); color: var(--muted, #555); }
