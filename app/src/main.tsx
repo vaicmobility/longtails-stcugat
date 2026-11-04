@@ -7,6 +7,7 @@ import { Peu } from './components/Peu'
 import './index.css'
 import { Cessions } from './pages/Cessions'
 import { Detall } from './pages/Detall'
+import { DocumentsPrograma } from './pages/DocumentsPrograma'
 import { Inscripcio } from './pages/Inscripcio'
 import { Lliurament } from './pages/Lliurament'
 import { Portal } from './pages/Portal'
@@ -31,6 +32,7 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/botiga/retorn/:id" element={<NomesAdmin><Retorn /></NomesAdmin>} />
           <Route path="/botiga/cessio/:id" element={<Botiga><Detall /></Botiga>} />
           <Route path="/botiga/preinscripcions" element={<Botiga><Preinscripcions /></Botiga>} />
+          <Route path="/botiga/documentacio" element={<NomesAdmin><DocumentsPrograma /></NomesAdmin>} />
           {/* Públic, sense login */}
           <Route path="/inscripcio" element={<Inscripcio />} />
           <Route path="/portal" element={<Portal />} />
