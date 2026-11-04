@@ -1,5 +1,6 @@
 import { useState } from 'react'
 import { Seccions } from '../components/Documentacio'
+import { CapcaleraPublica } from '../components/Marca'
 import { enviarPreinscripcio, type DadesPreinscripcio } from '../lib/preinscripcio'
 import { POLITICA_PRIVACITAT } from '../lib/textos'
 
@@ -41,10 +42,7 @@ export function Inscripcio() {
 
   return (
     <div className="content" style={{ maxWidth: 720 }}>
-      <div style={{ display: 'flex', alignItems: 'center', gap: '1rem', margin: '1rem 0 1.2rem', flexWrap: 'wrap' }}>
-        <img src="/assets/logo-santcugat.png" alt="Ajuntament de Sant Cugat" style={{ height: 52 }} />
-        <div className="brand">VAIC <span>Mobility</span></div>
-      </div>
+      <CapcaleraPublica />
 
       {fet ? (
         <section className="card">
@@ -55,7 +53,7 @@ export function Inscripcio() {
         </section>
       ) : (
         <form className="card" onSubmit={enviar} noValidate>
-          <h1>Preinscripció · Programa de bicicletes longtail</h1>
+          <h1>Preinscripció</h1>
           <p className="muted">Omple les teves dades abans de venir a recollir la bicicleta. Així el lliurament serà molt més ràpid.</p>
 
           <div className="grid2 mt-s">
