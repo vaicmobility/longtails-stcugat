@@ -21,7 +21,7 @@ export function Retorn() {
   const [fotos, setFotos] = useState<File[]>([])
   const [error, setError] = useState<string | null>(null)
   const [desant, setDesant] = useState(false)
-  const [resultat, setResultat] = useState<{ pdfBlob: Blob; wordBlob: Blob } | null>(null)
+  const [resultat, setResultat] = useState<{ pdfBlob: Blob } | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -91,7 +91,7 @@ export function Retorn() {
   if (resultat)
     return (
       <Resultat titol="Retorn completat" text={`Cessió finalitzada. La bicicleta torna a estar lliure per a una nova cessió.`}
-        pdfBlob={resultat.pdfBlob} wordBlob={resultat.wordBlob} nomFitxer={`acta-devolucio-${cessio.bicicletes?.codi ?? ''}`}
+        pdfBlob={resultat.pdfBlob} nomFitxer={`acta-devolucio-${cessio.bicicletes?.codi ?? ''}`}
         onDetall={() => nav(`/botiga/cessio/${cessio.id}`)} />
     )
 
