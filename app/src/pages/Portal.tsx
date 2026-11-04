@@ -75,7 +75,6 @@ function Acces() {
 
 function LesMevesCessions({ email }: { email: string }) {
   const [cessions, setCessions] = useState<CessioPortal[] | null>(null)
-  const [preinscrit, setPreinscrit] = useState(false)
   const [error, setError] = useState<string | null>(null)
 
   useEffect(() => {
@@ -84,11 +83,9 @@ function LesMevesCessions({ email }: { email: string }) {
       supabase.from('cessions')
         .select('*, bicicletes(id,codi,marca,model,tipus,color,num_bastidor,num_serie_bateria,codi_cadenat,estat), cessio_actes(*)')
         .ilike('usuari_email', e).neq('estat', 'cancel·lada').order('created_at', { ascending: false }),
-      supabase.from('preinscripcions').select('id').eq('email', e).eq('estat', 'pendent').limit(1),
-    ]).then(([c, p]) => {
+    ]).then(([c]) => {
       if (c.error) throw new Error(c.error.message)
       setCessions((c.data ?? []).map((x) => ({ ...x, actes: x.cessio_actes ?? [] })) as CessioPortal[])
-      setPreinscrit(!!p.data?.length)
     }).catch((err) => setError(err.message))
   }, [email])
 
@@ -104,9 +101,8 @@ function LesMevesCessions({ email }: { email: string }) {
       <h1>La meva bicicleta</h1>
       {!cessions.length ? (
         <div className="card">
-          {preinscrit
-            ? <p>Hem rebut la teva preinscripció. Quan es faci el lliurament de la bicicleta, aquí en veuràs les dades i la documentació signada.</p>
-            : <p>No hi ha cap cessió de bicicleta associada al correu <strong>{email}</strong>. Si creus que és un error, contacta amb nosaltres a {PROGRAMA.canal.formulari}.</p>}
+          <p>Estem preparant la cessió de la teva bicicleta. Mentrestant, revisa i llegeix la documentació del programa per agilitzar els tràmits en el moment del lliurament.</p>
+          <a className="btn small" href="#documentacio">Veure la documentació del programa</a>
         </div>
       ) : null}
 
@@ -138,8 +134,8 @@ function LesMevesCessions({ email }: { email: string }) {
 
       <Incidencies cessions={cessions.filter((c) => c.estat === 'activa')} />
 
-      <section className="card">
-        <h2>Textos del programa</h2>
+      <section className="card" id="documentacio">
+        <h2>Documentació del programa</h2>
         <TextAnnexI />
         <TextAnnexII />
         <TextAnnexIII />
