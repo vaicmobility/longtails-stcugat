@@ -22,7 +22,7 @@ export function Portal() {
     <div className="content" style={{ maxWidth: 820 }}>
       <CapcaleraPublica>
         {session ? (
-          <div style={{ marginLeft: 'auto', display: 'flex', gap: '.6rem', alignItems: 'center' }}>
+          <div style={{ display: 'flex', gap: '.6rem', alignItems: 'center' }}>
             <span className="muted small">{session.user.email}</span>
             <button className="btn ghost small" onClick={() => supabase.auth.signOut()}>Sortir</button>
           </div>
