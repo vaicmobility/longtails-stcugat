@@ -11,7 +11,7 @@ const b64ToBytes = (b64: string) => Uint8Array.from(atob(b64), (c) => c.charCode
 const box = (v: boolean) => (v ? '☒' : '☐')
 
 export async function generarWord(l: ActaLliurament, r?: ActaRetorn | null): Promise<Blob> {
-  const tpl = await fetch('/assets/plantilla_annexos_longtail.docx').then((res) => res.arrayBuffer())
+  const tpl = await fetch(`${import.meta.env.BASE_URL}assets/plantilla_annexos_longtail.docx`).then((res) => res.arrayBuffer())
   const imageModule = new ImageModule({
     centered: false,
     getImage: (v: string) => b64ToBytes(v ? v.replace(/^data:image\/\w+;base64,/, '') : PIXEL),
