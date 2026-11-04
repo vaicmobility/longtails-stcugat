@@ -48,8 +48,8 @@ const Header = () => (
   <>
     <SideMarks />
     <View style={s.header} fixed>
-      <Image style={s.logo} src="/assets/logo-santcugat.png" />
-      <Image style={s.adreca} src="/assets/adreca-santcugat.png" />
+      <Image style={s.logo} src={`${import.meta.env.BASE_URL}assets/logo-santcugat.png`} />
+      <Image style={s.adreca} src={`${import.meta.env.BASE_URL}assets/adreca-santcugat.png`} />
     </View>
   </>
 )
