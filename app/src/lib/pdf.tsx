@@ -1,5 +1,5 @@
 // PDF de les actes (Annex I i II) generat a partir de les dades. Format proper al Word oficial.
-import { Document, Image, Page, StyleSheet, Text, View, pdf } from '@react-pdf/renderer'
+import { Document, Image, Line, Page, StyleSheet, Svg, Text, View, pdf } from '@react-pdf/renderer'
 import type { ReactNode } from 'react'
 import { PROGRAMA } from '../config'
 import { data, dataHora } from './format'
@@ -23,8 +23,7 @@ const s = StyleSheet.create({
   label: { backgroundColor: LABEL_BG, fontFamily: 'Helvetica-BoldOblique' },
   head: { backgroundColor: HEAD_BG, fontFamily: 'Helvetica-BoldOblique', textAlign: 'center' },
   check: { flexDirection: 'row', alignItems: 'center', marginBottom: 3 },
-  box: { width: 7, height: 7, border: '0.7pt solid #000', marginRight: 4, alignItems: 'center', justifyContent: 'center' },
-  boxX: { fontSize: 6.5, fontFamily: 'Helvetica-Bold', lineHeight: 1 },
+  box: { width: 7.5, height: 7.5, border: '0.7pt solid #000', marginRight: 4, alignItems: 'center', justifyContent: 'center' },
   sig: { width: 120, height: 42, objectFit: 'contain' },
   sigEmpty: { width: 120, height: 42 },
   footer: { position: 'absolute', bottom: 22, right: 54, fontSize: 7, color: '#555' },
@@ -61,8 +60,16 @@ const Footer = ({ refDoc }: { refDoc: string }) => (
   </>
 )
 
+// Casella dibuixada amb vectors (un text "X" dins d'una caixa tan petita queda retallat i no es veu).
 const Box = ({ on }: { on: boolean }) => (
-  <View style={s.box}>{on ? <Text style={s.boxX}>X</Text> : null}</View>
+  <View style={s.box}>
+    {on ? (
+      <Svg style={{ width: 6.1, height: 6.1 }} viewBox="0 0 6 6">
+        <Line x1="1" y1="1" x2="5" y2="5" stroke="#000" strokeWidth={1.1} />
+        <Line x1="5" y1="1" x2="1" y2="5" stroke="#000" strokeWidth={1.1} />
+      </Svg>
+    ) : null}
+  </View>
 )
 
 const Check = ({ on, children }: { on: boolean; children: ReactNode }) => (
@@ -237,9 +244,9 @@ const AnnexII = ({ l, r, refDoc }: { l: ActaLliurament; r: ActaRetorn; refDoc: s
         <View style={{ padding: 4 }}>
           <Text style={{ fontFamily: 'Helvetica-Oblique' }}>Nom i cognoms: {r.retorn_persona}</Text>
           <Text style={{ fontFamily: 'Helvetica-Oblique' }}>DNI/NIE: {r.retorn_persona_document}</Text>
-          <View style={{ flexDirection: 'row', alignItems: 'center', marginVertical: 2 }}>
+          <View style={{ flexDirection: 'row', flexWrap: 'wrap', alignItems: 'center', marginVertical: 2 }}>
             <Text style={{ fontFamily: 'Helvetica-Oblique' }}>Condició:  </Text>
-            <Box on={r.condicio === 'beneficiaria'} /><Text style={{ fontFamily: 'Helvetica-Oblique' }}>Persona beneficiària   </Text>
+            <Box on={r.condicio === 'beneficiaria'} /><Text style={{ fontFamily: 'Helvetica-Oblique' }}>Persona beneficiària  </Text>
             <Box on={r.condicio === 'autoritzada'} /><Text style={{ fontFamily: 'Helvetica-Oblique' }}>Persona adulta autoritzada</Text>
           </View>
           <Text style={{ fontFamily: 'Helvetica-Oblique' }}>Data i hora: {dataHora(r.retorn_data_hora)}</Text>
