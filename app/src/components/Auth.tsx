@@ -2,6 +2,7 @@ import type { Session } from '@supabase/supabase-js'
 import { createContext, useContext, useEffect, useState, type ReactNode } from 'react'
 import { Navigate } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
+import { LOGO_AJUNTAMENT, TitolPrograma } from './Marca'
 
 /** admin = personal VAIC (tot); gestor = gestor de flota de l'organització (només consulta). */
 type Ctx = { session: Session | null; admin: boolean; gestor: boolean; carregant: boolean }
@@ -45,7 +46,8 @@ export function Login() {
   return (
     <div className="login">
       <form className="card login-card" onSubmit={entrar}>
-        <div className="brand big">VAIC <span>Cessions</span></div>
+        <img src={LOGO_AJUNTAMENT} alt="Ajuntament de Sant Cugat" style={{ height: 44, width: 'auto', alignSelf: 'flex-start' }} />
+        <TitolPrograma gran />
         <p className="muted">Accés per al personal de botiga i els gestors de flota. Fes servir el mateix usuari que a l'app VAIC Renting.</p>
         <label>Correu electrònic<input type="email" autoComplete="username" value={email} onChange={(e) => setEmail(e.target.value)} required /></label>
         <label>Contrasenya<input type="password" autoComplete="current-password" value={password} onChange={(e) => setPassword(e.target.value)} required /></label>
