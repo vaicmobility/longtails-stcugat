@@ -1,4 +1,4 @@
-import { useEffect, useMemo, useState } from 'react'
+import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Fotos, Steps } from '../components/Layout'
 import { SignaturePad } from '../components/SignaturePad'
@@ -61,6 +61,7 @@ export function Lliurament() {
   const [error, setError] = useState<string | null>(null)
   const [desant, setDesant] = useState(false)
   const [resultat, setResultat] = useState<{ cessioId: string; pdfBlob: Blob; wordBlob: Blob } | null>(null)
+  const idNou = useRef(crypto.randomUUID()) // id estable: els reintents no dupliquen la cessió
 
   const set = <K extends keyof ActaLliurament>(k: K, v: ActaLliurament[K]) => setA((x) => ({ ...x, [k]: v }))
 
@@ -183,7 +184,7 @@ export function Lliurament() {
     setError(null)
     try {
       localStorage.setItem('vaic_tecnic_nom', a.tecnic_nom)
-      const r = await finalitzarLliurament({ cessioId, clientId, bici, acta: a, fotos })
+      const r = await finalitzarLliurament({ cessioId: cessioId ?? idNou.current, clientId, bici, acta: a, fotos })
       if (preinsId) await marcarPreinscripcio(preinsId, 'convertida', r.cessioId).catch(() => {})
       setResultat(r)
     } catch (e) {
