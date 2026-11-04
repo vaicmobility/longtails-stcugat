@@ -1,9 +1,9 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../components/Auth'
 import { CapcaleraPublica } from '../components/Marca'
-import { Text, TextAnnexI, TextAnnexII, TextAnnexIII, TextDadesAjuntament, TextPrivacitat } from '../components/Documentacio'
+import { TextAnnexI, TextAnnexII, TextAnnexIII, TextDadesAjuntament, TextPrivacitat } from '../components/Documentacio'
+import { DocumentacioPrograma } from '../components/DocumentacioPrograma'
 import { PROGRAMA } from '../config'
-import { llistarDocuments, netejarHtml, type DocumentPrograma } from '../lib/documents'
 import { obrirFitxer } from '../lib/fitxers'
 import { data, dataHora, marcaModel } from '../lib/format'
 import { supabase } from '../lib/supabase'
@@ -135,7 +135,10 @@ function LesMevesCessions({ email }: { email: string }) {
 
       <Incidencies cessions={cessions.filter((c) => c.estat === 'activa')} />
 
-      <DocumentacioPrograma />
+      <section className="card" id="documentacio">
+        <h2>Documentació del programa</h2>
+        <DocumentacioPrograma perDefecte={<><TextAnnexI /><TextAnnexII /><TextAnnexIII /><TextDadesAjuntament /><TextPrivacitat /></>} />
+      </section>
     </div>
   )
 }
@@ -283,28 +286,3 @@ function DialegIncidencia({ cessions, onTancar, onEnviada }: { cessions: CessioP
   )
 }
 
-/** Textos gestionats des de la botiga (Documentació). Si encara no n'hi ha cap, es mostren els textos per defecte. */
-function DocumentacioPrograma() {
-  const [docs, setDocs] = useState<DocumentPrograma[] | null>(null)
-  useEffect(() => { llistarDocuments().then((d) => setDocs(d.filter((x) => x.visible))).catch(() => setDocs([])) }, [])
-  return (
-    <section className="card" id="documentacio">
-      <h2>Documentació del programa</h2>
-      {docs === null ? <div className="muted">Carregant…</div> : docs.length ? (
-        docs.map((d) => (
-          <Text key={d.id} titol={d.titol}>
-            <div className="text-doc" dangerouslySetInnerHTML={{ __html: netejarHtml(d.contingut_html) }} />
-          </Text>
-        ))
-      ) : (
-        <>
-          <TextAnnexI />
-          <TextAnnexII />
-          <TextAnnexIII />
-          <TextDadesAjuntament />
-          <TextPrivacitat />
-        </>
-      )}
-    </section>
-  )
-}
