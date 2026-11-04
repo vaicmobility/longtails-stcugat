@@ -3,6 +3,7 @@ import { createRoot } from 'react-dom/client'
 import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 import { AuthProvider, RequireAdmin, RequireStaff } from './components/Auth'
 import { Layout } from './components/Layout'
+import { Peu } from './components/Peu'
 import './index.css'
 import { Cessions } from './pages/Cessions'
 import { Detall } from './pages/Detall'
@@ -36,6 +37,7 @@ createRoot(document.getElementById('root')!).render(
           {/* Pròximament: /c/:token portal d'usuaris */}
           <Route path="*" element={<Navigate to="/botiga" replace />} />
         </Routes>
+        <Peu />
       </BrowserRouter>
     </AuthProvider>
   </StrictMode>,
