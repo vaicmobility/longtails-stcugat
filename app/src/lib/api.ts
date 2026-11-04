@@ -1,4 +1,3 @@
-import { generarWord } from './docx'
 import { carregarReglament } from './documents'
 import { pdfLliurament, pdfRetorn } from './pdf'
 import { BUCKET, supabase } from './supabase'
@@ -160,22 +159,21 @@ export async function finalitzarLliurament(params: {
   const ref = refCessio(cessio)
   const final = { ...acta, num_fotos: params.fotos.length }
   const reglament = await carregarReglament() // el Reglament s'imprimeix davant de l'Annex I
-  const [pdfBlob, wordBlob] = await Promise.all([pdfLliurament(final, ref, reglament), generarWord(final)])
+  const pdfBlob = await pdfLliurament(final, ref, reglament)
 
   // 2) Després es desa la cessió (insereix o actualitza), les fotos, els fitxers i l'acta.
   ok(await supabase.from('cessions').upsert({ id: cessio.id, ...camps }, { onConflict: 'id' }).select('id').single())
   const fotos = await pujarFotos(cessio.id, 'lliurament', params.fotos)
   const pdf_path = await pujar(`${cessio.id}/${ref}-acta-lliurament.pdf`, pdfBlob, 'application/pdf')
-  const docx_path = await pujar(`${cessio.id}/${ref}-annexos.docx`, wordBlob, wordBlob.type)
 
   ok(await supabase.from('cessio_actes').upsert(
-    { cessio_id: cessio.id, fase: 'lliurament', dades: final, pdf_path, docx_path, fotos, signat_at: new Date().toISOString() },
+    { cessio_id: cessio.id, fase: 'lliurament', dades: final, pdf_path, docx_path: null, fotos, signat_at: new Date().toISOString() },
     { onConflict: 'cessio_id,fase' },
   ))
-  return { cessioId: cessio.id, pdfBlob, wordBlob }
+  return { cessioId: cessio.id, pdfBlob }
 }
 
-/** Retorn: genera Annex II, regenera el Word complet i tanca la cessió. No toca l'estat de la bici. */
+/** Retorn: genera l'acta de devolució (Annex II) i tanca la cessió. No toca l'estat de la bici. */
 export async function finalitzarRetorn(params: {
   cessio: Cessio; lliurament: ActaLliurament; acta: ActaRetorn; fotos: File[]
 }) {
@@ -183,15 +181,13 @@ export async function finalitzarRetorn(params: {
   const ref = refCessio(cessio)
   const fotos = await pujarFotos(cessio.id, 'retorn', params.fotos)
   const final = { ...acta, num_fotos: params.fotos.length }
-  const [pdfBlob, wordBlob] = await Promise.all([pdfRetorn(lliurament, final, ref), generarWord(lliurament, final)])
+  const pdfBlob = await pdfRetorn(lliurament, final, ref)
   const pdf_path = await pujar(`${cessio.id}/${ref}-acta-devolucio.pdf`, pdfBlob, 'application/pdf')
-  const docx_path = await pujar(`${cessio.id}/${ref}-annexos.docx`, wordBlob, wordBlob.type)
 
   ok(await supabase.from('cessio_actes').upsert(
-    { cessio_id: cessio.id, fase: 'retorn', dades: final, pdf_path, docx_path, fotos, signat_at: new Date().toISOString() },
+    { cessio_id: cessio.id, fase: 'retorn', dades: final, pdf_path, docx_path: null, fotos, signat_at: new Date().toISOString() },
     { onConflict: 'cessio_id,fase' },
   ))
-  ok(await supabase.from('cessio_actes').update({ docx_path }).eq('cessio_id', cessio.id).eq('fase', 'lliurament'))
   ok(await supabase.from('cessions').update({
     estat: 'finalitzada',
     check_out: new Date(acta.retorn_data_hora).toISOString(),
@@ -199,5 +195,5 @@ export async function finalitzarRetorn(params: {
     signatura_retorn: acta.signatures.persona,
     data_signatura_retorn: new Date().toISOString(),
   }).eq('id', cessio.id))
-  return { pdfBlob, wordBlob }
+  return { pdfBlob }
 }
