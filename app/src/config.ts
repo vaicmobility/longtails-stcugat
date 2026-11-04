@@ -6,7 +6,8 @@ export const PROGRAMA = {
   lloc_horari_retorn: 'Botiga VAIC · (horari a definir)',
   // Canal únic de comunicació i incidències. Els camps sense valor es mostren com a "—" als annexos.
   canal: {
-    telefon: '—',
+    telefon: '936 75 45 70',
+    whatsapp: '34634974051', // número internacional sense '+' (per a wa.me)
     email: '—',
     formulari: 'https://longtail.vaic.com',
     horari: '—',
