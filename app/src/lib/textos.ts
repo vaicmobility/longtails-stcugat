@@ -22,7 +22,7 @@ export const ANNEX_I_MANIFESTACIONS: Manifestacio[] = [
 /** Manifestacions addicionals: document a part, signat amb les mateixes signatures del lliurament. */
 export const MANIFESTACIONS_ADDICIONALS: Manifestacio[] = [
   {
-    text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut la formació presencial prevista al reglament i una explicació de tot el contingut del Manual d’ús de la bicicleta, incloent entre d’altres:",
+    text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut la formació presencial prevista al reglament i una explicació de tot el contingut del Manual d’ús de la bicicleta, que declaren haver comprès i que declaren estar-hi conformes amb la signatura de la present acta, i que inclou entre d’altres:",
     subitems: [
       "Informació sobre les condicions efectives de responsabilitat civil, assistència i robatori, especificant-ne els límits i exclusions, així com aclariment exprés de si existeix cobertura d’accidents i danys corporals dels ocupants.",
       "Informació sobre els canals i els terminis de comunicació dels sinistres.",
