@@ -5,23 +5,33 @@ import { PROGRAMA } from '../config'
 export type Seccio = { titol: string; paras?: string[]; items?: string[]; despres?: string[] }
 
 /**
- * Manifestacions de l'Annex I (acta de lliurament), segons el Reglament definitiu (versió amb el Manual de la persona usuària).
+ * Manifestacions de l'Annex I (acta de lliurament), segons el model original de l'Ajuntament.
  * Font única: es fan servir al PDF de l'acta i a les pantalles (lliurament i portal).
  */
-export type Manifestacio = { text: string; detalls?: string[] }
+export type Manifestacio = { text: string; subitems?: string[]; detalls?: string[] }
 
 export const ANNEX_I_MANIFESTACIONS: Manifestacio[] = [
   { text: "La persona beneficiària declara que rep la bicicleta i els elements materials associats en estat aparent de funcionament correcte, llevat de les incidències que consten expressament en aquesta acta." },
-  { text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver realitzat la formació prèvia obligatòria prevista en el Reglament que es recull al Manual de la persona usuària annexat a la present acta." },
-  { text: "La persona beneficiària declara haver rebut informació sobre l’abast i les condicions bàsiques de l’assegurança, així com sobre els canals i els terminis de comunicació dels sinistres, que es recull al Manual de la persona usuària annexat a la present acta." },
-  { text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut les instruccions d’ús i seguretat de la bicicleta, així com informació sobre els límits de pes, càrrega, ocupació i transport d’infants aplicables al model assignat, que es recull al Manual de la persona usuària annexat a la present acta." },
-  { text: "La persona beneficiària declara haver rebut la informació relativa al tractament de les dades personals vinculades a la gestió del programa i haver estat informada sobre el responsable del tractament, la finalitat, la base jurídica, els destinataris, el termini de conservació i l’exercici dels seus drets, incloent el tractament per part de VAIC Mobility SL que es recull al Manual de la persona usuària annexat a la present acta." },
+  { text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver realitzat la formació prèvia obligatòria prevista en el Reglament." },
+  { text: "La persona beneficiària declara haver rebut informació sobre l’abast i les condicions bàsiques de l’assegurança, així com sobre els canals i els terminis de comunicació dels sinistres." },
+  { text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut les instruccions d’ús i seguretat de la bicicleta, així com informació sobre els límits de pes, càrrega, ocupació i transport d’infants aplicables al model assignat." },
+  { text: "La persona beneficiària declara haver rebut la informació relativa al tractament de les dades personals vinculades a la gestió del programa i haver estat informada sobre el responsable del tractament, la finalitat, la base jurídica, els destinataris, el termini de conservació i l’exercici dels seus drets." },
+  { text: "La persona beneficiària declara haver comprovat l’estat aparent de la bicicleta i dels accessoris lliurats i manifesta la seva conformitat, llevat de les observacions expressament consignades en aquesta acta." },
+]
+
+/** Manifestacions addicionals: document a part, signat amb les mateixes signatures del lliurament. */
+export const MANIFESTACIONS_ADDICIONALS: Manifestacio[] = [
   {
-    text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut informació sobre els itineraris ciclables del municipi accessibles a través del Geoportal municipal i es compromet a prioritzar, sempre que sigui possible, itineraris segurs, xarxa ciclable existent, vies pacificades i recorreguts amb baixa intensitat de trànsit, especialment quan transportin infants.",
-    detalls: [
-      "Enllaç al “geoportal” de l’Ajuntament de Sant Cugat del Vallès: https://geociutat.santcugat.cat/geoportal, 05. Mobilitat i transport, carrils bici.",
+    text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut la formació presencial prevista al reglament i una explicació de tot el contingut del Manual d’ús de la bicicleta, incloent entre d’altres:",
+    subitems: [
+      "Informació sobre les condicions efectives de responsabilitat civil, assistència i robatori, especificant-ne els límits i exclusions, així com aclariment exprés de si existeix cobertura d’accidents i danys corporals dels ocupants.",
+      "Informació sobre els canals i els terminis de comunicació dels sinistres.",
+      "Instruccions d’ús i seguretat de la bicicleta, així com informació sobre els límits de pes, càrrega, ocupació i transport d’infants aplicables al model assignat.",
+      "Informació relativa al tractament de les dades personals vinculades a la gestió del programa i haver estat informada sobre el responsable del tractament, la finalitat, la base jurídica, els destinataris, el termini de conservació i l’exercici dels seus drets, incloent el tractament per part de VAIC Mobility SL per a poder gestionar el programa.",
     ],
   },
+  { text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut informació sobre el mapa d’itineraris ciclables recomanats per l’Ajuntament de Sant Cugat, que inclou els carrils bici i les vies urbanes regulades amb velocitats màximes de 10, 20 i 30 km/h." },
+  { text: "La persona usuària i, si escau, les altres persones adultes autoritzades declaren haver pogut revisar sobre aquest mapa tots els itineraris que tenen previst realitzar amb la bicicleta del programa i declaren que efectivament es poden realitzar utilitzant els itineraris ciclables recomanats per l’Ajuntament. Així mateix si durant el període de vigència de la cessió de la bicicleta tenen altres necessitats diferents hauran de validar aquests itineraris contactant amb el Servei de Mobilitat a través de mobilitat@santcugat.cat" },
   {
     text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren conèixer i aplicar la normativa aplicable a la circulació de bicicletes al municipi.",
     detalls: [
@@ -32,7 +42,6 @@ export const ANNEX_I_MANIFESTACIONS: Manifestacio[] = [
     ],
   },
   { text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren disposar d’un espai d’accés restringit per a deixar la bicicleta quan aquesta no s’utilitzi i en especial, per a estacionar-la durant la nit entre les 21h i les 7h si es vol mantenir la cobertura de robatori oferta per VAIC Mobility, tal i com es recull al Manual de la persona usuària annexat a la present acta." },
-  { text: "La persona beneficiària i, si escau, les altres persones adultes autoritzades declaren haver rebut la informació sobre les condicions efectives de responsabilitat civil, assistència i robatori, especificant-ne els límits i exclusions, així com aclariment exprés de si existeix cobertura d’accidents i danys corporals dels ocupants, tal i com es recull al Manual de la persona usuària annexat a la present acta." },
 ]
 
 export const ANNEX_II_CLAUSULES = [
