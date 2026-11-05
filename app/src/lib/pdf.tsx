@@ -165,6 +165,92 @@ const LlistaManifestacions = ({ items }: { items: Manifestacio[] }) => (
   </>
 )
 
+// ---------------------------------------------------------------- Text formatat (HTML net de la Documentació) → PDF
+type Estil = { b?: boolean; i?: boolean; u?: boolean }
+const fontDe = (e: Estil) => (e.b ? 'Helvetica-BoldOblique' : 'Helvetica-Oblique') // la plantilla ja és tota en cursiva
+
+/** Contingut en línia (text, negreta, enllaços…) d'un node, sense els sub-blocs (llistes i paràgrafs interiors). */
+function enLinia(n: Node, e: Estil, k: string): ReactNode[] {
+  const out: ReactNode[] = []
+  n.childNodes.forEach((c, i) => {
+    const key = `${k}.${i}`
+    if (c.nodeType === Node.TEXT_NODE) { if (c.textContent) out.push(c.textContent.replace(/\s+/g, ' ')); return }
+    if (c.nodeType !== Node.ELEMENT_NODE) return
+    const el = c as Element
+    const tag = el.tagName.toLowerCase()
+    if (['ul', 'ol', 'p', 'h3', 'h4', 'blockquote', 'div'].includes(tag)) return
+    if (tag === 'br') { out.push('\n'); return }
+    const e2: Estil = { b: e.b || tag === 'strong' || tag === 'b', i: e.i || tag === 'em' || tag === 'i', u: e.u || tag === 'u' }
+    const fills = enLinia(el, e2, key)
+    if (tag === 'a') {
+      const href = el.getAttribute('href') ?? ''
+      out.push(<Link key={key} src={href} style={{ color: '#1f4e9c', fontFamily: fontDe(e2) }}>{fills}</Link>)
+    } else if (e2.b !== e.b || e2.u !== e.u) {
+      out.push(<Text key={key} style={{ fontFamily: fontDe(e2), textDecoration: e2.u ? 'underline' : 'none' }}>{fills}</Text>)
+    } else out.push(...fills)
+  })
+  return out
+}
+
+const teText = (xs: ReactNode[]) => xs.some((x) => typeof x !== 'string' || x.trim())
+
+/** Blocs (paràgrafs, títols, llistes) d'un node. Cada punt de llista de primer nivell es manté sencer a la mateixa pàgina. */
+function blocs(n: Node, k: string, nivell = 0): ReactNode[] {
+  const out: ReactNode[] = []
+  const marge = nivell ? 8 + (nivell - 1) * 12 : 0
+  const linia = enLinia(n, {}, k)
+  if (nivell === 0 && teText(linia)) out.push(<Text key={k + 't'} style={s.p}>{linia}</Text>)
+  n.childNodes.forEach((c, i) => {
+    if (c.nodeType !== Node.ELEMENT_NODE) return
+    const el = c as Element
+    const tag = el.tagName.toLowerCase()
+    const key = `${k}.${i}`
+    if (tag === 'p' || tag === 'div' || tag === 'blockquote') {
+      const l = enLinia(el, {}, key)
+      if (teText(l)) out.push(<Text key={key} style={[s.p, { marginLeft: marge }]}>{l}</Text>)
+      out.push(...blocs(el, key + 'b', Math.max(nivell, 0)).filter((_, j) => j > 0 || !teText(l)))
+    } else if (tag === 'h3' || tag === 'h4') {
+      out.push(<Text key={key} style={[s.h2, { marginLeft: marge }]} minPresenceAhead={40}>{enLinia(el, { b: true }, key)}</Text>)
+    } else if (tag === 'ul' || tag === 'ol') {
+      Array.from(el.children).filter((li) => li.tagName.toLowerCase() === 'li').forEach((li, j) => {
+        const lk = `${key}.${j}`
+        const marca = tag === 'ol' ? `${j + 1}. ` : nivell === 0 ? '• ' : '– '
+        const item = (
+          <View key={lk} wrap={nivell > 0} style={{ marginBottom: nivell ? 0 : 2 }}>
+            <Text style={[s.p, { marginLeft: nivell ? 12 + (nivell - 1) * 12 : 0 }]}>{marca}{enLinia(li, {}, lk)}</Text>
+            {blocsInteriors(li, lk, nivell + 1)}
+          </View>
+        )
+        out.push(item)
+      })
+    }
+  })
+  return out
+}
+
+/** Sub-blocs d'un punt de llista: paràgrafs (sagnats) i llistes niades. */
+function blocsInteriors(li: Element, k: string, nivell: number): ReactNode[] {
+  const out: ReactNode[] = []
+  li.childNodes.forEach((c, i) => {
+    if (c.nodeType !== Node.ELEMENT_NODE) return
+    const el = c as Element
+    const tag = el.tagName.toLowerCase()
+    const key = `${k}.${i}`
+    if (tag === 'ul' || tag === 'ol') {
+      const tmp = document.createElement('div'); tmp.appendChild(el.cloneNode(true))
+      out.push(...blocs(tmp, key, nivell))
+    } else if (tag === 'p' || tag === 'div' || tag === 'blockquote') {
+      out.push(<Text key={key} style={[s.p, { marginLeft: 8 }]}>{enLinia(el, {}, key)}</Text>)
+    }
+  })
+  return out
+}
+
+const TextHtml = ({ html }: { html: string }) => {
+  const doc = new DOMParser().parseFromString(`<div>${html}</div>`, 'text/html')
+  return <>{blocs(doc.body.firstChild ?? doc.body, 'h')}</>
+}
+
 // ---------------------------------------------------------------- Annex I
 const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
   <Page size="A4" style={s.page}>
@@ -226,7 +312,7 @@ const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
 )
 
 // ---------------------------------------------------------------- Manifestacions addicionals (document a part)
-const ManifestacionsAddicionals = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
+const ManifestacionsAddicionals = ({ a, refDoc, html }: { a: ActaLliurament; refDoc: string; html?: string | null }) => (
   <Page size="A4" style={s.page}>
     <Header />
     <Footer refDoc={refDoc} />
@@ -242,7 +328,7 @@ const ManifestacionsAddicionals = ({ a, refDoc }: { a: ActaLliurament; refDoc: s
       ]}
     />
     <Text style={s.h2} minPresenceAhead={60}>Manifestacions addicionals</Text>
-    <LlistaManifestacions items={MANIFESTACIONS_ADDICIONALS} />
+    {html ? <TextHtml html={html} /> : <LlistaManifestacions items={MANIFESTACIONS_ADDICIONALS} />}
 
     <View wrap={false} style={[s.row, { marginTop: 10, borderTop: `0.6pt solid ${BORDER}`, borderLeft: `0.6pt solid ${BORDER}` }]}>
       <SigBlock title="Persona beneficiària" src={a.signatures.benef}
@@ -385,11 +471,11 @@ export const pdfLliurament = (a: ActaLliurament, refDoc: string, reglament?: Reg
     </Document>,
   ).toBlob()
 
-/** Manifestacions addicionals: segon PDF del lliurament, amb les mateixes signatures. */
-export const pdfManifestacionsAddicionals = (a: ActaLliurament, refDoc: string) =>
+/** Manifestacions addicionals: segon PDF del lliurament, amb les mateixes signatures. `html`: text vigent de la Documentació. */
+export const pdfManifestacionsAddicionals = (a: ActaLliurament, refDoc: string, html?: string | null) =>
   pdf(
     <Document title={`Manifestacions addicionals ${refDoc}`} author={PROGRAMA.empresa_nom} language="ca">
-      <ManifestacionsAddicionals a={a} refDoc={refDoc} />
+      <ManifestacionsAddicionals a={a} refDoc={refDoc} html={html} />
     </Document>,
   ).toBlob()
 
