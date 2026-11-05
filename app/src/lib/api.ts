@@ -1,3 +1,4 @@
+import { carregarManifestacionsAddicionals } from './documents'
 import { pdfLliurament, pdfManifestacionsAddicionals, pdfRetorn } from './pdf'
 import { BUCKET, supabase } from './supabase'
 import type { ActaLliurament, ActaRetorn, Bicicleta, Cessio, CessioActa, Organitzacio } from './types'
@@ -156,9 +157,11 @@ export async function finalitzarLliurament(params: {
   //    que si cal reintentar s'actualitza la mateixa cessió en lloc de crear-ne una altra.
   const cessio = { id: params.cessioId ?? crypto.randomUUID() }
   const ref = refCessio(cessio)
-  const final: ActaLliurament = { ...acta, num_fotos: params.fotos.length }
+  // Text vigent de les manifestacions addicionals (Documentació). Se'n desa una còpia amb l'acta: és el que s'ha signat.
+  const manifestacionsHtml = await carregarManifestacionsAddicionals().catch(() => null)
+  const final: ActaLliurament = { ...acta, num_fotos: params.fotos.length, manifestacions_html: manifestacionsHtml ?? undefined }
   const pdfBlob = await pdfLliurament(final, ref)
-  const pdfManifestacions = await pdfManifestacionsAddicionals(final, ref)
+  const pdfManifestacions = await pdfManifestacionsAddicionals(final, ref, manifestacionsHtml)
 
   // 2) Després es desa la cessió (insereix o actualitza), les fotos, els fitxers i l'acta.
   ok(await supabase.from('cessions').upsert({ id: cessio.id, ...camps }, { onConflict: 'id' }).select('id').single())
