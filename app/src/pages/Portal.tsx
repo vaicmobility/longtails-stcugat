@@ -64,7 +64,7 @@ function Acces() {
         </>
       ) : (
         <>
-          <p className="muted">Escriu el correu electrònic que vas donar al lliurament de la bicicleta. Rebràs un enllaç per entrar, sense contrasenya.</p>
+          <p className="muted">Escriu el teu correu electrònic que vas indicar quan et vas inscriure al programa. Rebràs un enllaç per entrar, sense contrasenya.</p>
           <label>Correu electrònic<input type="email" inputMode="email" autoComplete="email" value={email} onChange={(e) => setEmail(e.target.value)} /></label>
           {error ? <div className="alert error mt-s">{error}</div> : null}
           <button className="btn primary mt-s" disabled={enviant} style={{ width: '100%' }}>{enviant ? 'Enviant…' : "Enviar l'enllaç d'accés"}</button>
