@@ -1,4 +1,3 @@
-import { carregarReglament } from './documents'
 import { pdfLliurament, pdfRetorn } from './pdf'
 import { BUCKET, supabase } from './supabase'
 import type { ActaLliurament, ActaRetorn, Bicicleta, Cessio, CessioActa, Organitzacio } from './types'
@@ -64,7 +63,7 @@ export async function cercarUsuariPerEmail(email: string) {
   if (!r.length) return null
   const actes = await getActes(r[0].id)
   const l = actes.find((a) => a.fase === 'lliurament')?.dades as ActaLliurament | undefined
-  return { ...r[0], escola_bressol: l?.escola_bressol, infant_unitat_familiar: l?.infant_unitat_familiar, adult_nom: l?.adult_nom, adult_document: l?.adult_document }
+  return { ...r[0], escola_bressol: l?.escola_bressol, infant_unitat_familiar: l?.infant_unitat_familiar, infant2: l?.infant2, adult_nom: l?.adult_nom, adult_document: l?.adult_document }
 }
 
 /**
@@ -158,8 +157,7 @@ export async function finalitzarLliurament(params: {
   const cessio = { id: params.cessioId ?? crypto.randomUUID() }
   const ref = refCessio(cessio)
   const final = { ...acta, num_fotos: params.fotos.length }
-  const reglament = await carregarReglament() // el Reglament s'imprimeix davant de l'Annex I
-  const pdfBlob = await pdfLliurament(final, ref, reglament)
+  const pdfBlob = await pdfLliurament(final, ref)
 
   // 2) Després es desa la cessió (insereix o actualitza), les fotos, els fitxers i l'acta.
   ok(await supabase.from('cessions').upsert({ id: cessio.id, ...camps }, { onConflict: 'id' }).select('id').single())
