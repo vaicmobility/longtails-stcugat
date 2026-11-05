@@ -5,7 +5,7 @@ import { SignaturePad } from '../components/SignaturePad'
 import { TextAnnexII } from '../components/Documentacio'
 import { DocumentacioPrograma } from '../components/DocumentacioPrograma'
 import { ESTATS_ELEMENT, PROGRAMA } from '../config'
-import { finalitzarRetorn, getActes, getCessio } from '../lib/api'
+import { finalitzarRetorn, getActes, getCessio, type ResultatCorreu } from '../lib/api'
 import { ara, data, durada } from '../lib/format'
 import type { ActaLliurament, ActaRetorn, Cessio, ElementRetornat } from '../lib/types'
 import { Resultat } from './Resultat'
@@ -22,7 +22,7 @@ export function Retorn() {
   const [fotos, setFotos] = useState<File[]>([])
   const [error, setError] = useState<string | null>(null)
   const [desant, setDesant] = useState(false)
-  const [resultat, setResultat] = useState<{ pdfBlob: Blob } | null>(null)
+  const [resultat, setResultat] = useState<{ pdfBlob: Blob; correu: ResultatCorreu } | null>(null)
 
   useEffect(() => {
     if (!id) return
@@ -93,7 +93,7 @@ export function Retorn() {
     return (
       <Resultat titol="Retorn completat" text={`Cessió finalitzada. La bicicleta torna a estar lliure per a una nova cessió.`}
         pdfBlob={resultat.pdfBlob} nomFitxer={`acta-devolucio-${cessio.bicicletes?.codi ?? ''}`}
-        onDetall={() => nav(`/botiga/cessio/${cessio.id}`)} />
+        correu={resultat.correu} onDetall={() => nav(`/botiga/cessio/${cessio.id}`)} />
     )
 
   return (
