@@ -93,6 +93,12 @@ export function Detall() {
               <button className="btn small" onClick={() => obrir(l.pdf_path)}>PDF</button>
             </div>
           ) : null}
+          {ld?.manifestacions_pdf_path ? (
+            <div className="doc">
+              <div><strong>Manifestacions addicionals</strong><div className="muted small">Signades amb l'acta de lliurament</div></div>
+              <button className="btn small" onClick={() => obrir(ld.manifestacions_pdf_path!)}>PDF</button>
+            </div>
+          ) : null}
           {r ? (
             <div className="doc">
               <div><strong>Acta de devolució (Annex II)</strong><div className="muted small">Signada {dataHora(r.signat_at)} · {r.fotos.length} fotos</div></div>
