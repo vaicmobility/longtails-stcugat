@@ -1,15 +1,19 @@
-import type { ReactNode } from 'react'
-import { Link, NavLink } from 'react-router-dom'
+import { useEffect, useState, type ReactNode } from 'react'
+import { Link, NavLink, useLocation } from 'react-router-dom'
 import { supabase } from '../lib/supabase'
 import { useAuth } from './Auth'
 import { TitolPrograma } from './Marca'
 
 export function Layout({ children }: { children: ReactNode }) {
   const { session, admin } = useAuth()
+  const { pathname } = useLocation()
+  const [menu, setMenu] = useState(false)
+  useEffect(() => setMenu(false), [pathname])
   return (
     <div className="shell">
-      <header className="topbar">
-        <Link to="/botiga" style={{ textDecoration: 'none', maxWidth: 360 }}><TitolPrograma /></Link>
+      <header className={`topbar${menu ? ' obert' : ''}`}>
+        <Link to="/botiga" className="topbar-titol"><TitolPrograma /></Link>
+        <button type="button" className="menu-btn" aria-label="Menú" aria-expanded={menu} onClick={() => setMenu(!menu)}>{menu ? '✕' : '☰'}</button>
         <nav>
           <NavLink to="/botiga" end>Cessions</NavLink>
           <NavLink to="/botiga/preinscripcions">Preinscripcions</NavLink>
@@ -17,7 +21,7 @@ export function Layout({ children }: { children: ReactNode }) {
         </nav>
         <div className="user">
           {admin ? <NavLink to="/botiga/documentacio" className="btn ghost small" title="Textos del programa que es mostren al portal">Documentació</NavLink> : null}
-          <span className="muted">{session?.user.email}</span>
+          <span className="muted email">{session?.user.email}</span>
           <button className="btn ghost small" onClick={() => supabase.auth.signOut()}>Sortir</button>
         </div>
       </header>
