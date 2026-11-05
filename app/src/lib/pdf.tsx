@@ -4,7 +4,7 @@ import type { ReactNode } from 'react'
 import { PROGRAMA } from '../config'
 import { data, dataHora } from './format'
 import type { Reglament } from './documents'
-import { ANNEX_I_MANIFESTACIONS } from './textos'
+import { ANNEX_I_MANIFESTACIONS, MANIFESTACIONS_ADDICIONALS, type Manifestacio } from './textos'
 import type { ActaLliurament, ActaRetorn } from './types'
 
 // Sense partició automàtica de paraules: evita talls incorrectes en català i en les URL (enllaços trencats).
@@ -153,6 +153,18 @@ const PaginesReglament = ({ r, refDoc }: { r: Reglament; refDoc: string }) => (
   </Page>
 )
 
+const LlistaManifestacions = ({ items }: { items: Manifestacio[] }) => (
+  <>
+    {items.map((m, i) => (
+      <View key={i} wrap={false} style={{ marginBottom: 2 }}>
+        <Text style={s.p}>• <TextAmbEnllacos text={m.text} /></Text>
+        {m.subitems?.map((d, j) => <Text key={'s' + j} style={[s.p, { marginLeft: 12 }]}>– <TextAmbEnllacos text={d} /></Text>)}
+        {m.detalls?.map((d, j) => <Text key={j} style={[s.p, { marginLeft: 8 }]}><TextAmbEnllacos text={d} /></Text>)}
+      </View>
+    ))}
+  </>
+)
+
 // ---------------------------------------------------------------- Annex I
 const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
   <Page size="A4" style={s.page}>
@@ -192,14 +204,9 @@ const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
       <Text style={[s.cell, { minHeight: 34 }]}>{a.observacions || ' '}</Text>
     </View>
 
-    {/* Manifestacions (Reglament definitiu). Cada punt es manté sencer a la mateixa pàgina. */}
+    {/* Manifestacions. Cada punt es manté sencer a la mateixa pàgina. */}
     <Text style={s.h2} minPresenceAhead={60}>Manifestacions</Text>
-    {ANNEX_I_MANIFESTACIONS.map((m, i) => (
-      <View key={i} wrap={false} style={{ marginBottom: 2 }}>
-        <Text style={s.p}>• {m.text}</Text>
-        {m.detalls?.map((d, j) => <Text key={j} style={[s.p, { marginLeft: 8 }]}><TextAmbEnllacos text={d} /></Text>)}
-      </View>
-    ))}
+    <LlistaManifestacions items={ANNEX_I_MANIFESTACIONS} />
 
     <View wrap={false} style={{ marginTop: 10 }}>
       <View style={[s.row, { borderTop: `0.6pt solid ${BORDER}`, borderLeft: `0.6pt solid ${BORDER}` }]}>
@@ -214,6 +221,36 @@ const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
             lines={[`Nom i cognoms: ${a.adult_nom}`, `DNI/NIE: ${a.adult_document ?? ''}`, `Data: ${data(a.lliurament_data_hora)}`]} />
         </View>
       ) : null}
+    </View>
+  </Page>
+)
+
+// ---------------------------------------------------------------- Manifestacions addicionals (document a part)
+const ManifestacionsAddicionals = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
+  <Page size="A4" style={s.page}>
+    <Header />
+    <Footer refDoc={refDoc} />
+    <Text style={s.h1}>Manifestacions addicionals a l'acta de lliurament</Text>
+    <KV
+      rows={[
+        ['Persona beneficiària', a.beneficiaria_nom],
+        ['DNI/NIE o document identificatiu', a.beneficiaria_document],
+        ['Altres persones adultes autoritzades', [a.adult_nom, a.adult_document && `DNI/NIE: ${a.adult_document}`].filter(Boolean).join(' · ')],
+        ['Bicicleta assignada', [a.bici_marca_model, a.bici_identificacio].filter(Boolean).join(' · ')],
+        ['Data i hora de lliurament', dataHora(a.lliurament_data_hora)],
+        ['Acta de lliurament de referència', refDoc],
+      ]}
+    />
+    <Text style={s.h2} minPresenceAhead={60}>Manifestacions addicionals</Text>
+    <LlistaManifestacions items={MANIFESTACIONS_ADDICIONALS} />
+
+    <View wrap={false} style={[s.row, { marginTop: 10, borderTop: `0.6pt solid ${BORDER}`, borderLeft: `0.6pt solid ${BORDER}` }]}>
+      <SigBlock title="Persona beneficiària" src={a.signatures.benef}
+        lines={[`Nom i cognoms: ${a.beneficiaria_nom}`, `Data: ${data(a.lliurament_data_hora)}`]} />
+      {a.adult_nom ? (
+        <SigBlock title="Altres persones adultes autoritzades" src={a.signatures.adult}
+          lines={[`Nom i cognoms: ${a.adult_nom}`, `DNI/NIE: ${a.adult_document ?? ''}`, `Data: ${data(a.lliurament_data_hora)}`]} />
+      ) : <View style={{ flex: 1 }} />}
     </View>
   </Page>
 )
@@ -345,6 +382,14 @@ export const pdfLliurament = (a: ActaLliurament, refDoc: string, reglament?: Reg
       {reglament ? <PaginesReglament r={reglament} refDoc={refDoc} /> : null}
       <AnnexI a={a} refDoc={refDoc} />
       <AnnexIII refDoc={refDoc} />
+    </Document>,
+  ).toBlob()
+
+/** Manifestacions addicionals: segon PDF del lliurament, amb les mateixes signatures. */
+export const pdfManifestacionsAddicionals = (a: ActaLliurament, refDoc: string) =>
+  pdf(
+    <Document title={`Manifestacions addicionals ${refDoc}`} author={PROGRAMA.empresa_nom} language="ca">
+      <ManifestacionsAddicionals a={a} refDoc={refDoc} />
     </Document>,
   ).toBlob()
 
