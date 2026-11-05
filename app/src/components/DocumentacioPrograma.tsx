@@ -6,10 +6,14 @@ import { Text } from './Documentacio'
  * Textos del programa gestionats des de la botiga (Documentació), amb els PDF adjunts.
  * Es fa servir al portal i abans de signar el lliurament. Si encara no hi ha cap text, mostra `perDefecte`.
  */
-export function DocumentacioPrograma({ perDefecte, obrirPrimer }: { perDefecte: ReactNode; obrirPrimer?: boolean }) {
+export function DocumentacioPrograma({ perDefecte, obrirPrimer, fase }: { perDefecte: ReactNode; obrirPrimer?: boolean; fase?: 'lliurament' | 'retorn' }) {
   const [docs, setDocs] = useState<DocumentPrograma[] | null>(null)
   const [error, setError] = useState<string | null>(null)
-  useEffect(() => { llistarDocuments().then((d) => setDocs(d.filter((x) => x.visible))).catch(() => setDocs([])) }, [])
+  useEffect(() => {
+    llistarDocuments()
+      .then((d) => setDocs(d.filter((x) => x.visible && (!fase || (fase === 'lliurament' ? x.mostrar_lliurament : x.mostrar_retorn)))))
+      .catch(() => setDocs([]))
+  }, [fase])
 
   if (docs === null) return <div className="muted">Carregant…</div>
   if (!docs.length) return <>{perDefecte}</>
