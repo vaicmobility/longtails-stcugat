@@ -7,9 +7,9 @@ export const SUBTITOL_PROGRAMA = 'Famílies de les escoles bressol municipals ·
 /** Títol del programa en dues línies. */
 export function TitolPrograma({ gran }: { gran?: boolean }) {
   return (
-    <div style={{ lineHeight: 1.2, minWidth: 0 }}>
-      <div style={{ fontWeight: 800, color: 'var(--accent)', fontSize: gran ? '1.35rem' : '1rem' }}>{TITOL_PROGRAMA}</div>
-      <div className="muted" style={{ fontSize: gran ? '.92rem' : '.78rem' }}>{SUBTITOL_PROGRAMA}</div>
+    <div className="titol-programa" style={{ lineHeight: 1.2, minWidth: 0 }}>
+      <div className="titol" style={{ fontWeight: 800, color: 'var(--accent)', fontSize: gran ? '1.35rem' : '1rem' }}>{TITOL_PROGRAMA}</div>
+      <div className="muted subtitol" style={{ fontSize: gran ? '.92rem' : '.78rem' }}>{SUBTITOL_PROGRAMA}</div>
     </div>
   )
 }
