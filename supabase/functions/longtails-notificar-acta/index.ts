@@ -19,10 +19,14 @@ const WHATSAPP = '34679923756'
 const EMAIL = 'serveis@vaic.com'
 
 function plantilla(p: { nom: string; fase: 'lliurament' | 'retorn'; bici: string; data: string }) {
-  const titol = p.fase === 'retorn' ? 'Acta de devolució signada' : 'Acta de lliurament signada'
-  const frase = p.fase === 'retorn'
-    ? `Hem registrat la devolució de la bicicleta <strong>${esc(p.bici)}</strong>${p.data ? ` el ${esc(p.data)}` : ''}. Gràcies per participar en el programa!`
-    : `Ja tens la bicicleta <strong>${esc(p.bici)}</strong>${p.data ? `, lliurada el ${esc(p.data)}` : ''}. Esperem que la gaudeixis molt!`
+  const titol = p.fase === 'retorn' ? 'Gràcies per participar!' : 'Acta de lliurament signada'
+  const retorn = p.fase === 'retorn'
+  const cos = retorn
+    ? `<p style="margin:0 0 14px;">Hem registrat la devolució de la bicicleta <strong>${esc(p.bici)}</strong>${p.data ? ` el ${esc(p.data)}` : ''}. La cessió queda finalitzada.</p>
+      <p style="margin:0 0 14px;">Moltes gràcies per haver participat en el programa de bicicletes long tail de Sant Cugat. Esperem que t'hagi ajudat a moure't en bici amb la família i que la segueixis fent servir com a mitjà de transport!</p>
+      <p style="margin:0 0 22px;">Tota la <strong>documentació de la cessió</strong> (l'acta de lliurament, les manifestacions addicionals i l'acta de devolució signades) continua disponible al teu portal.</p>`
+    : `<p style="margin:0 0 14px;">Ja tens la bicicleta <strong>${esc(p.bici)}</strong>${p.data ? `, lliurada el ${esc(p.data)}` : ''}. Esperem que la gaudeixis molt!</p>
+      <p style="margin:0 0 22px;">Al teu portal pots consultar en qualsevol moment la <strong>documentació generada</strong> (actes signades i documentació del programa) i fer la <strong>gestió de la teva bicicleta</strong>, com ara comunicar una incidència.</p>`
   return `<!doctype html>
 <html lang="ca"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>${titol}</title></head>
 <body style="margin:0;padding:0;background:#f4f5f2;">
@@ -35,10 +39,9 @@ function plantilla(p: { nom: string; fase: 'lliurament' | 'retorn'; bici: string
     </td></tr>
     <tr><td style="padding:28px 28px 8px;font-size:15px;line-height:1.55;">
       <p style="margin:0 0 14px;">Hola ${esc(p.nom)},</p>
-      <p style="margin:0 0 14px;">${frase}</p>
-      <p style="margin:0 0 22px;">Al teu portal pots consultar en qualsevol moment la <strong>documentació generada</strong> (actes signades i documentació del programa) i fer la <strong>gestió de la teva bicicleta</strong>, com ara comunicar una incidència.</p>
+      ${cos}
       <table role="presentation" cellpadding="0" cellspacing="0" style="margin:0 auto 22px;"><tr><td style="background:#2f7d4f;border-radius:10px;">
-        <a href="${PORTAL}" style="display:inline-block;padding:14px 28px;color:#ffffff;text-decoration:none;font-weight:bold;font-size:16px;">Accedeix al teu portal</a>
+        <a href="${PORTAL}" style="display:inline-block;padding:14px 28px;color:#ffffff;text-decoration:none;font-weight:bold;font-size:16px;">${retorn ? 'Consulta la documentació' : 'Accedeix al teu portal'}</a>
       </td></tr></table>
       <p style="margin:0 0 6px;text-align:center;"><a href="${PORTAL}" style="color:#2f7d4f;font-weight:bold;text-decoration:none;">longtail.vaic.com</a></p>
       <p style="margin:0 0 22px;text-align:center;font-size:13px;color:#6a726d;">Entra amb aquest mateix correu electrònic: rebràs un enllaç d'accés, sense contrasenya.</p>
@@ -96,7 +99,7 @@ Deno.serve(async (req) => {
     const bici = [[b.marca, b.model].filter(Boolean).join(' '), b.codi && `(${b.codi})`].filter(Boolean).join(' ')
     const html = plantilla({ nom: c.usuari_nom ?? '', fase, bici: bici || 'del programa', data: dataCat(fase === 'retorn' ? c.check_out : c.check_in) })
     const assumpte = fase === 'retorn'
-      ? 'Bicicleta long tail: acta de devolució signada'
+      ? 'Bicicleta long tail: devolució registrada, gràcies per participar!'
       : 'Bicicleta long tail: acta de lliurament signada'
 
     const resend = new Resend(Deno.env.get('RESEND_API_KEY')!)
