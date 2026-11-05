@@ -1,4 +1,4 @@
-import { pdfLliurament, pdfRetorn } from './pdf'
+import { pdfLliurament, pdfManifestacionsAddicionals, pdfRetorn } from './pdf'
 import { BUCKET, supabase } from './supabase'
 import type { ActaLliurament, ActaRetorn, Bicicleta, Cessio, CessioActa, Organitzacio } from './types'
 
@@ -127,7 +127,7 @@ async function pujarFotos(cessioId: string, fase: string, fotos: File[]) {
   return paths
 }
 
-/** Lliurament: crea (o actualitza una cessió programada), genera PDF + Word, desa-ho tot. No toca l'estat de la bici. */
+/** Lliurament: crea (o actualitza una cessió programada), genera l'acta i les manifestacions addicionals (PDF), desa-ho tot. No toca l'estat de la bici. */
 export async function finalitzarLliurament(params: {
   cessioId?: string | null
   clientId: string | null
@@ -156,19 +156,21 @@ export async function finalitzarLliurament(params: {
   //    que si cal reintentar s'actualitza la mateixa cessió en lloc de crear-ne una altra.
   const cessio = { id: params.cessioId ?? crypto.randomUUID() }
   const ref = refCessio(cessio)
-  const final = { ...acta, num_fotos: params.fotos.length }
+  const final: ActaLliurament = { ...acta, num_fotos: params.fotos.length }
   const pdfBlob = await pdfLliurament(final, ref)
+  const pdfManifestacions = await pdfManifestacionsAddicionals(final, ref)
 
   // 2) Després es desa la cessió (insereix o actualitza), les fotos, els fitxers i l'acta.
   ok(await supabase.from('cessions').upsert({ id: cessio.id, ...camps }, { onConflict: 'id' }).select('id').single())
   const fotos = await pujarFotos(cessio.id, 'lliurament', params.fotos)
   const pdf_path = await pujar(`${cessio.id}/${ref}-acta-lliurament.pdf`, pdfBlob, 'application/pdf')
+  final.manifestacions_pdf_path = await pujar(`${cessio.id}/${ref}-manifestacions-addicionals.pdf`, pdfManifestacions, 'application/pdf')
 
   ok(await supabase.from('cessio_actes').upsert(
     { cessio_id: cessio.id, fase: 'lliurament', dades: final, pdf_path, docx_path: null, fotos, signat_at: new Date().toISOString() },
     { onConflict: 'cessio_id,fase' },
   ))
-  return { cessioId: cessio.id, pdfBlob }
+  return { cessioId: cessio.id, pdfBlob, pdfManifestacions }
 }
 
 /** Retorn: genera l'acta de devolució (Annex II) i tanca la cessió. No toca l'estat de la bici. */
