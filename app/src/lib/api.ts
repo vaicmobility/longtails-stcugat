@@ -128,6 +128,22 @@ async function pujarFotos(cessioId: string, fase: string, fotos: File[]) {
   return paths
 }
 
+export type ResultatCorreu = { ok: true; a: string } | { ok: false; error: string }
+
+/** Envia a la persona usuària el correu de l'acta signada (enllaç al portal). Mai fa fallar el procés. */
+export async function notificarActa(cessioId: string, fase: 'lliurament' | 'retorn'): Promise<ResultatCorreu> {
+  try {
+    const { data, error } = await supabase.functions.invoke('longtails-notificar-acta', { body: { cessio_id: cessioId, fase } })
+    if (error) {
+      const cos = await (error as { context?: Response }).context?.json?.().catch(() => null)
+      return { ok: false, error: cos?.error ?? error.message }
+    }
+    return data?.ok ? { ok: true, a: data.a } : { ok: false, error: data?.error ?? 'Error desconegut' }
+  } catch (e) {
+    return { ok: false, error: (e as Error).message }
+  }
+}
+
 /** Lliurament: crea (o actualitza una cessió programada), genera l'acta i les manifestacions addicionals (PDF), desa-ho tot. No toca l'estat de la bici. */
 export async function finalitzarLliurament(params: {
   cessioId?: string | null
@@ -173,7 +189,8 @@ export async function finalitzarLliurament(params: {
     { cessio_id: cessio.id, fase: 'lliurament', dades: final, pdf_path, docx_path: null, fotos, signat_at: new Date().toISOString() },
     { onConflict: 'cessio_id,fase' },
   ))
-  return { cessioId: cessio.id, pdfBlob, pdfManifestacions }
+  const correu = await notificarActa(cessio.id, 'lliurament')
+  return { cessioId: cessio.id, pdfBlob, pdfManifestacions, correu }
 }
 
 /** Retorn: genera l'acta de devolució (Annex II) i tanca la cessió. No toca l'estat de la bici. */
@@ -198,5 +215,6 @@ export async function finalitzarRetorn(params: {
     signatura_retorn: acta.signatures.persona,
     data_signatura_retorn: new Date().toISOString(),
   }).eq('id', cessio.id))
-  return { pdfBlob }
+  const correu = await notificarActa(cessio.id, 'retorn')
+  return { pdfBlob, correu }
 }
