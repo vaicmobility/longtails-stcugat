@@ -56,9 +56,9 @@ function plantilla(p: { nom: string; fase: 'lliurament' | 'retorn'; bici: string
     </td></tr>
     <tr><td style="border-top:1px solid #dfe3dd;padding:22px 20px 18px;" align="center">
       <table role="presentation" cellpadding="0" cellspacing="0"><tr>
-        <td style="padding:0 12px;" valign="middle"><img src="${IMG}/logo-ajuntament.png" alt="Ajuntament de Sant Cugat" height="34" style="display:block;height:34px;width:auto;border:0;"></td>
-        <td style="padding:0 12px;" valign="middle"><img src="${IMG}/logo-vaic.png" alt="VAIC · La vida en bici" height="26" style="display:block;height:26px;width:auto;border:0;"></td>
-        <td style="padding:0 12px;" valign="middle"><img src="${IMG}/logo-impulsa.png" alt="Impulsa la Bici" height="26" style="display:block;height:26px;width:auto;border:0;"></td>
+        <td style="padding:0 12px;" valign="middle"><a href="https://santcugat.cat"><img src="${IMG}/logo-ajuntament.png" alt="Ajuntament de Sant Cugat" height="34" style="display:block;height:34px;width:auto;border:0;"></a></td>
+        <td style="padding:0 12px;" valign="middle"><a href="https://vaic.com"><img src="${IMG}/logo-vaic.png" alt="VAIC · La vida en bici" height="26" style="display:block;height:26px;width:auto;border:0;"></a></td>
+        <td style="padding:0 12px;" valign="middle"><a href="https://impulsalabici.com"><img src="${IMG}/logo-impulsa.png" alt="Impulsa la Bici" height="26" style="display:block;height:26px;width:auto;border:0;"></a></td>
       </tr></table>
       <p style="margin:14px 0 0;font-size:11px;color:#8a918c;line-height:1.5;">Has rebut aquest correu perquè participes en el programa de cessió de bicicletes long tail de l'Ajuntament de Sant Cugat del Vallès, gestionat per VAIC Mobility.</p>
     </td></tr>
