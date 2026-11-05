@@ -12,9 +12,9 @@ export function Peu() {
   return (
     <>
     <footer style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: '1.6rem', flexWrap: 'wrap', padding: '1.6rem 1rem 1.2rem', opacity: 0.85 }}>
-      <img src={LOGO_AJUNTAMENT} alt="Ajuntament de Sant Cugat" style={{ height: 30, width: 'auto' }} />
-      <img src={LOGO_VAIC} alt="VAIC · La vida en bici" style={{ height: 26, width: 'auto' }} />
-      <img src={LOGO_IMPULSA} alt="Impulsa la Bici" style={{ height: 26, width: 'auto' }} />
+      <a href="https://santcugat.cat" target="_blank" rel="noreferrer"><img src={LOGO_AJUNTAMENT} alt="Ajuntament de Sant Cugat" style={{ height: 30, width: 'auto', display: 'block' }} /></a>
+      <a href="https://vaic.com" target="_blank" rel="noreferrer"><img src={LOGO_VAIC} alt="VAIC · La vida en bici" style={{ height: 26, width: 'auto', display: 'block' }} /></a>
+      <a href="https://impulsalabici.com" target="_blank" rel="noreferrer"><img src={LOGO_IMPULSA} alt="Impulsa la Bici" style={{ height: 26, width: 'auto', display: 'block' }} /></a>
     </footer>
     {!aBotiga ? (
       <div style={{ textAlign: 'center', padding: '0 1rem 1.2rem' }}>
