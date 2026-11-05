@@ -20,7 +20,10 @@
   -webkit-tap-highlight-color: transparent;
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); }
+html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+html, body { overflow-x: clip; max-width: 100%; }
+body { margin: 0; background: var(--bg); overflow-wrap: break-word; }
+img, svg, iframe, canvas, video { max-width: 100%; }
 h1 { font-size: 1.6rem; margin: 0 0 .6rem; }
 h2 { font-size: 1.1rem; margin: 0 0 .8rem; }
 a { color: var(--brand); }
@@ -145,9 +148,48 @@ textarea { resize: vertical; }
 @media (max-width: 760px) {
   .grid2, .sigs { grid-template-columns: 1fr; }
   .element, .element.ret { grid-template-columns: 1fr 1fr; }
-  .topbar .user .muted { display: none; }
   .steps .txt { display: none; }
-  .list .row { flex-wrap: wrap; }
+  .list .row { flex-wrap: wrap; gap: .5rem .8rem; padding: .8rem .9rem; }
+  .list .row .row-main { flex: 1 1 100%; }
+}
+
+/* Capçalera: escriptori */
+.topbar-titol { text-decoration: none; max-width: 360px; min-width: 0; }
+.menu-btn { display: none; }
+
+/* Mòbil: capçalera compacta amb menú desplegable i res que desbordi */
+@media (max-width: 760px) {
+  :root { font-size: 16px; }
+  h1 { font-size: 1.35rem; }
+  h2 { font-size: 1.05rem; }
+  .content { padding: .8rem; }
+  .card { padding: 1rem; }
+  input, select, textarea { font-size: max(16px, 1rem); }
+  .topbar { flex-wrap: wrap; gap: .5rem; padding: .45rem .8rem; }
+  .topbar-titol { flex: 1; max-width: none; }
+  .topbar-titol .subtitol { display: none; }
+  .topbar-titol .titol { white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: .95rem !important; }
+  .menu-btn { display: inline-flex; align-items: center; justify-content: center; flex: none; width: 44px; height: 44px; font-size: 1.35rem; border: 1px solid var(--line); border-radius: 10px; background: #fff; color: var(--ink); cursor: pointer; }
+  .topbar nav, .topbar .user { display: none; }
+  .topbar.obert nav, .topbar.obert .user { display: flex; flex-direction: column; align-items: stretch; flex: 1 1 100%; gap: .25rem; }
+  .topbar.obert nav { padding-top: .4rem; border-top: 1px solid var(--line); }
+  .topbar.obert nav a:not(.btn) { padding: .65rem .3rem; box-shadow: none; }
+  .topbar.obert nav a.active:not(.btn) { color: var(--brand); }
+  .topbar.obert .btn, .topbar.obert .pill { justify-content: center; text-align: center; }
+  .topbar.obert .user { padding: .4rem 0 .5rem; border-top: 1px solid var(--line); font-size: .9rem; }
+  .topbar.obert .user .email { text-align: center; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .btn { max-width: 100%; white-space: normal; text-align: center; }
+  .page-head { flex-wrap: wrap; }
+  .page-head > * { min-width: 0; }
+  .seg { display: flex; max-width: 100%; overflow-x: auto; -webkit-overflow-scrolling: touch; }
+  .seg button { flex: none; white-space: nowrap; }
+  .toolbar input { min-width: 0; flex: 1 1 100%; }
+  .wizard-nav { flex-wrap: wrap; }
+  .wizard-nav .right { flex-wrap: wrap; justify-content: flex-end; }
+  .resum { grid-template-columns: 1fr; gap: .1rem; }
+  .resum dd { min-width: 0; overflow-wrap: anywhere; margin-bottom: .5rem; }
+  .element > * { min-width: 0; }
+  .pdf-preview { height: 60vh; }
 }
 
 /* Textos del programa amb format (editor i portal) */
