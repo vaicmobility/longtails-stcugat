@@ -162,7 +162,7 @@ function ContacteBotiga() {
   return (
     <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
       <a className="btn" href={`tel:${PROGRAMA.canal.telefon.replace(/\s/g, '')}`}>Trucar a la botiga · {PROGRAMA.canal.telefon}</a>
-      <a className="btn" href={`https://wa.me/${PROGRAMA.canal.whatsapp}`} target="_blank" rel="noreferrer">WhatsApp</a>
+      <a className="btn" href={`https://wa.me/${PROGRAMA.canal.whatsapp}`} target="_blank" rel="noreferrer">WhatsApp avaries · {PROGRAMA.canal.avaries}</a>
     </div>
   )
 }
