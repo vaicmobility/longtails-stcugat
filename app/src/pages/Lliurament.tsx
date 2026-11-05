@@ -5,7 +5,7 @@ import { SignaturePad } from '../components/SignaturePad'
 import { TextAnnexI, TextAnnexIII, TextDadesAjuntament, TextManifestacionsAddicionals } from '../components/Documentacio'
 import { DocumentacioPrograma } from '../components/DocumentacioPrograma'
 import { ELEMENTS_PER_DEFECTE, ESTATS_ELEMENT, PROGRAMA, canalResum } from '../config'
-import { cercarBicis, cercarUsuariPerEmail, finalitzarLliurament, getCessio, llistarOrganitzacions } from '../lib/api'
+import { cercarBicis, cercarUsuariPerEmail, finalitzarLliurament, getCessio, llistarOrganitzacions, type ResultatCorreu } from '../lib/api'
 import { ara, identificacioBici, marcaModel } from '../lib/format'
 import { darreraPreinscripcio, getPreinscripcio, marcarPreinscripcio, type Preinscripcio } from '../lib/preinscripcio'
 import type { ActaLliurament, Bicicleta, ElementLliurat, Organitzacio } from '../lib/types'
@@ -62,7 +62,7 @@ export function Lliurament() {
   const [avis, setAvis] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [desant, setDesant] = useState(false)
-  const [resultat, setResultat] = useState<{ cessioId: string; pdfBlob: Blob; pdfManifestacions: Blob } | null>(null)
+  const [resultat, setResultat] = useState<{ cessioId: string; pdfBlob: Blob; pdfManifestacions: Blob; correu: ResultatCorreu } | null>(null)
   const idNou = useRef(crypto.randomUUID()) // id estable: els reintents no dupliquen la cessió
 
   const set = <K extends keyof ActaLliurament>(k: K, v: ActaLliurament[K]) => setA((x) => ({ ...x, [k]: v }))
@@ -203,7 +203,7 @@ export function Lliurament() {
       <Resultat titol="Lliurament completat" text={`La bicicleta ${bici?.codi ?? ''} queda cedida a ${a.beneficiaria_nom}.`}
         pdfBlob={resultat.pdfBlob} nomFitxer={`acta-lliurament-${bici?.codi ?? ''}`}
         extres={[{ titol: 'Manifestacions addicionals', blob: resultat.pdfManifestacions, nomFitxer: `manifestacions-addicionals-${bici?.codi ?? ''}` }]}
-        onDetall={() => nav(`/botiga/cessio/${resultat.cessioId}`)} />
+        correu={resultat.correu} onDetall={() => nav(`/botiga/cessio/${resultat.cessioId}`)} />
     )
 
   const updEl = (i: number, p: Partial<ElementLliurat>) =>
