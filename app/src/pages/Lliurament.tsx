@@ -31,6 +31,7 @@ const actaBuida = (): ActaLliurament => ({
   adult_nom: '',
   adult_document: '',
   infant_unitat_familiar: '',
+  infant2: '',
   lliurament_data_hora: ara(),
   lliurament_lloc: PROGRAMA.lloc_lliurament,
   retorn_data_prevista: '',
@@ -83,6 +84,7 @@ export function Lliurament() {
       beneficiaria_telefon: p.telefon ?? x.beneficiaria_telefon,
       escola_bressol: p.escola_bressol ?? x.escola_bressol,
       infant_unitat_familiar: p.infant_unitat_familiar ?? x.infant_unitat_familiar,
+      infant2: p.infant2 ?? x.infant2,
       adult_nom: p.adult_nom ?? x.adult_nom,
       adult_document: p.adult_document ?? x.adult_document,
       servei_gestor: p.servei_gestor ?? x.servei_gestor,
@@ -136,6 +138,7 @@ export function Lliurament() {
       beneficiaria_telefon: x.beneficiaria_telefon || u.usuari_telefon || '',
       escola_bressol: x.escola_bressol || u.escola_bressol || '',
       infant_unitat_familiar: x.infant_unitat_familiar || u.infant_unitat_familiar || '',
+      infant2: x.infant2 || u.infant2 || '',
       adult_nom: x.adult_nom || u.adult_nom || '',
       adult_document: x.adult_document || u.adult_document || '',
     }))
@@ -233,6 +236,7 @@ export function Lliurament() {
             </label>
             <label>Escola bressol municipal<input value={a.escola_bressol} onChange={(e) => set('escola_bressol', e.target.value)} /></label>
             <label>Infant matriculat / unitat familiar<input value={a.infant_unitat_familiar} onChange={(e) => set('infant_unitat_familiar', e.target.value)} /></label>
+            <label>Segon infant matriculat (si escau)<input value={a.infant2 ?? ''} onChange={(e) => set('infant2', e.target.value)} /></label>
             <label>Altra persona adulta autoritzada (opcional)
               <input value={a.adult_nom} onChange={(e) => set('adult_nom', e.target.value)} placeholder="Nom i cognoms" />
             </label>
