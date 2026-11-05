@@ -8,6 +8,7 @@ import {
 
 type Edicio = {
   id?: string; titol: string; contingut_html: string; visible: boolean; ordre: number
+  mostrar_lliurament: boolean; mostrar_retorn: boolean; clau?: string | null
   fitxer_path: string | null; fitxer_nom: string | null; pdfNou?: File | null
 }
 
@@ -89,6 +90,17 @@ export function DocumentsPrograma() {
             <input type="checkbox" checked={edicio.visible} onChange={(e) => setEdicio({ ...edicio, visible: e.target.checked })} />
             <span>Visible al portal de les persones usuàries</span>
           </label>
+          <label className="check">
+            <input type="checkbox" checked={edicio.mostrar_lliurament} onChange={(e) => setEdicio({ ...edicio, mostrar_lliurament: e.target.checked })} />
+            <span>Mostrar per llegir durant l'acta de lliurament</span>
+          </label>
+          <label className="check">
+            <input type="checkbox" checked={edicio.mostrar_retorn} onChange={(e) => setEdicio({ ...edicio, mostrar_retorn: e.target.checked })} />
+            <span>Mostrar per llegir durant l'acta de devolució (retorn)</span>
+          </label>
+          {edicio.clau === 'manifestacions_addicionals' ? (
+            <p className="alert info small">Aquest text s'imprimeix al PDF de manifestacions addicionals que signa la persona beneficiària. Els canvis s'aplicaran als lliuraments que es facin a partir d'ara.</p>
+          ) : null}
           {error ? <div className="alert error mt-s">{error}</div> : null}
           <div style={{ display: 'flex', gap: '.5rem', justifyContent: 'flex-end', marginTop: '1rem' }}>
             <button className="btn ghost" onClick={() => { setEdicio(null); setError(null) }}>Cancel·lar</button>
@@ -103,9 +115,9 @@ export function DocumentsPrograma() {
     <div>
       <div className="page-head">
         <h1>Documentació del programa</h1>
-        <button className="btn primary" onClick={() => setEdicio({ titol: '', contingut_html: '', visible: true, ordre: docs?.length ?? 0, fitxer_path: null, fitxer_nom: null })}>+ Nou text</button>
+        <button className="btn primary" onClick={() => setEdicio({ titol: '', contingut_html: '', visible: true, ordre: docs?.length ?? 0, fitxer_path: null, fitxer_nom: null, mostrar_lliurament: true, mostrar_retorn: false })}>+ Nou text</button>
       </div>
-      <p className="muted">Textos que es mostren a les persones usuàries al portal, en aquest ordre. Canviar-los no modifica les actes en PDF ni el Word.</p>
+      <p className="muted">Textos que es mostren a les persones usuàries al portal, en aquest ordre, i per llegir abans de signar el lliurament o el retorn segons s'indiqui a cada text. Les manifestacions addicionals també s'imprimeixen al seu PDF; la resta no modifica les actes.</p>
       {error ? <div className="alert error">{error}</div> : null}
       {!docs ? <div className="muted">Carregant…</div> : null}
       {docs && !docs.length ? <div className="empty card">Encara no hi ha cap text. Mentrestant el portal mostra els textos per defecte.</div> : null}
@@ -119,11 +131,11 @@ export function DocumentsPrograma() {
               </div>
               <div style={{ flex: 1, minWidth: 200 }}>
                 <div className="row-title">{i + 1}. {d.titol}</div>
-                <div className="muted small">{d.visible ? 'Visible' : 'Ocult'}{d.fitxer_path ? ' · 📄 PDF adjunt' : ''} · Actualitzat {dataHora(d.updated_at)}</div>
+                <div className="muted small">{d.visible ? 'Visible' : 'Ocult'}{d.mostrar_lliurament ? ' · Lliurament' : ''}{d.mostrar_retorn ? ' · Retorn' : ''}{d.clau === 'manifestacions_addicionals' ? ' · Va al PDF' : ''}{d.fitxer_path ? ' · 📄 PDF adjunt' : ''} · Actualitzat {dataHora(d.updated_at)}</div>
               </div>
               <div style={{ display: 'flex', gap: '.4rem', flexWrap: 'wrap' }}>
                 <button className="btn small ghost" onClick={() => setObert(obert === d.id ? null : d.id)}>{obert === d.id ? 'Amagar' : 'Veure'}</button>
-                <button className="btn small" onClick={() => setEdicio({ id: d.id, titol: d.titol, contingut_html: d.contingut_html, visible: d.visible, ordre: d.ordre, fitxer_path: d.fitxer_path, fitxer_nom: d.fitxer_nom })}>Editar</button>
+                <button className="btn small" onClick={() => setEdicio({ id: d.id, titol: d.titol, contingut_html: d.contingut_html, visible: d.visible, ordre: d.ordre, fitxer_path: d.fitxer_path, fitxer_nom: d.fitxer_nom, mostrar_lliurament: d.mostrar_lliurament, mostrar_retorn: d.mostrar_retorn, clau: d.clau })}>Editar</button>
                 <button className="btn small ghost" onClick={async () => { await canviarVisible(d.id, !d.visible).catch((e) => setError(e.message)); carregar() }}>
                   {d.visible ? 'Ocultar' : 'Mostrar'}
                 </button>
