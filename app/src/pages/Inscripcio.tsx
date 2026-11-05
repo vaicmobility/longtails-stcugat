@@ -4,7 +4,7 @@ import { CapcaleraPublica } from '../components/Marca'
 import { enviarPreinscripcio, type DadesPreinscripcio } from '../lib/preinscripcio'
 import { POLITICA_PRIVACITAT } from '../lib/textos'
 
-const buit: DadesPreinscripcio = { email: '', nom: '', document: '', telefon: '', escola_bressol: '', infant: '', adult_nom: '', adult_document: '' }
+const buit: DadesPreinscripcio = { email: '', nom: '', document: '', telefon: '', escola_bressol: '', infant: '', infant2: '', adult_nom: '', adult_document: '' }
 
 /** Formulari públic de preinscripció (sense login). */
 export function Inscripcio() {
@@ -65,6 +65,7 @@ export function Inscripcio() {
             <label>Telèfon<input type="tel" inputMode="tel" autoComplete="tel" value={d.telefon} onChange={(e) => set('telefon', e.target.value)} /></label>
             <label>Escola bressol municipal<input value={d.escola_bressol} onChange={(e) => set('escola_bressol', e.target.value)} /></label>
             <label className="span2">Infant matriculat / unitat familiar<input value={d.infant} onChange={(e) => set('infant', e.target.value)} /></label>
+            <label className="span2">Segon infant matriculat (si escau)<input value={d.infant2} onChange={(e) => set('infant2', e.target.value)} placeholder="Nom i cognoms del segon infant" /></label>
             <label>Altra persona adulta autoritzada (opcional)
               <input value={d.adult_nom} onChange={(e) => set('adult_nom', e.target.value)} placeholder="Nom i cognoms" />
             </label>
