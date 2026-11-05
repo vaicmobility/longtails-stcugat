@@ -53,6 +53,7 @@ function plantilla(p: { nom: string; fase: 'lliurament' | 'retorn'; bici: string
           Botiga VAIC: <a href="tel:+34${TEL.replace(/\s/g, '')}" style="color:#1d2320;">${TEL}</a><br>
           Avaries (telèfon i WhatsApp): <a href="https://wa.me/${WHATSAPP}" style="color:#1d2320;">${AVARIES}</a><br>
           Correu: <a href="mailto:${EMAIL}" style="color:#1d2320;">${EMAIL}</a><br>
+          Web: <a href="https://vaic.com" style="color:#1d2320;">vaic.com</a><br>
           <span style="color:#6a726d;font-size:13px;">De dilluns a divendres: de 10:00 a 14:00 i de 16:00 a 20:00</span>
         </td></tr>
       </table>
