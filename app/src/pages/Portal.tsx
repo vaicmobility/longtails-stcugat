@@ -47,7 +47,7 @@ function Acces() {
     setError(null)
     const { error } = await supabase.auth.signInWithOtp({
       email: email.trim().toLowerCase(),
-      options: { emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}portal`, shouldCreateUser: true },
+      options: { emailRedirectTo: `${window.location.origin}${import.meta.env.BASE_URL}`, shouldCreateUser: true },
     })
     setEnviant(false)
     if (error) setError("No s'ha pogut enviar el correu. Torna-ho a provar d'aquí a uns minuts.")
