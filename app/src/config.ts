@@ -7,7 +7,8 @@ export const PROGRAMA = {
   // Canal únic de comunicació i incidències. Els camps sense valor es mostren com a "—" als annexos.
   canal: {
     telefon: '936 75 45 70',
-    whatsapp: '34634974051', // número internacional sense '+' (per a wa.me)
+    avaries: '679 92 37 56', // telèfon d'avaries (també és el WhatsApp del portal)
+    whatsapp: '34679923756', // número internacional sense '+' (per a wa.me)
     email: 'serveis@vaic.com',
     formulari: 'https://longtail.vaic.com',
     horari: 'De dilluns a divendres: de 10:00 a 14:00 i de 16:00 a 20:00',
@@ -21,6 +22,7 @@ export const canalResum = () =>
   [
     PROGRAMA.canal.formulari,
     PROGRAMA.canal.telefon !== '—' && `Tel. ${PROGRAMA.canal.telefon}`,
+    `Avaries (tel. i WhatsApp) ${PROGRAMA.canal.avaries}`,
     PROGRAMA.canal.email !== '—' && PROGRAMA.canal.email,
   ].filter(Boolean).join(' · ')
 
