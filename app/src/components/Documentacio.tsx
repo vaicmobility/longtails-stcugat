@@ -1,6 +1,7 @@
 import type { ReactNode } from 'react'
+import type { Manifestacio } from '../lib/textos'
 import {
-  ANNEX_II_CLAUSULES, ANNEX_I_MANIFESTACIONS, CLAUSULA_DADES_AJUNTAMENT, POLITICA_PRIVACITAT, annexIII, type Seccio,
+  ANNEX_II_CLAUSULES, ANNEX_I_MANIFESTACIONS, CLAUSULA_DADES_AJUNTAMENT, MANIFESTACIONS_ADDICIONALS, POLITICA_PRIVACITAT, annexIII, type Seccio,
 } from '../lib/textos'
 
 const caixa: React.CSSProperties = {
@@ -42,17 +43,30 @@ export const TextPrivacitat = ({ obert }: { obert?: boolean }) => (
   <Text titol="Política de privacitat i protecció de dades" obert={obert}><Seccions seccions={POLITICA_PRIVACITAT} /></Text>
 )
 
-export const TextAnnexI = ({ obert }: { obert?: boolean }) => (
-  <Text titol="Annex I · Manifestacions de l'acta de lliurament" obert={obert}>
+function LlistaManifestacions({ items }: { items: Manifestacio[] }) {
+  return (
     <ul style={{ margin: 0, paddingLeft: '1.2rem' }}>
-      {ANNEX_I_MANIFESTACIONS.map((m, i) => (
+      {items.map((m, i) => (
         <li key={i} style={{ marginBottom: '.5rem' }}>
-          {m.text}
+          <AmbEnllacos text={m.text} />
+          {m.subitems?.length ? (
+            <ul style={{ margin: '.3rem 0 0', paddingLeft: '1.1rem', listStyle: 'circle' }}>
+              {m.subitems.map((d, j) => <li key={j} style={{ marginBottom: '.25rem' }}><AmbEnllacos text={d} /></li>)}
+            </ul>
+          ) : null}
           {m.detalls?.map((d, j) => <p key={j} style={{ margin: '.3rem 0 0' }}><AmbEnllacos text={d} /></p>)}
         </li>
       ))}
     </ul>
-  </Text>
+  )
+}
+
+export const TextAnnexI = ({ obert }: { obert?: boolean }) => (
+  <Text titol="Annex I · Manifestacions de l'acta de lliurament" obert={obert}><LlistaManifestacions items={ANNEX_I_MANIFESTACIONS} /></Text>
+)
+
+export const TextManifestacionsAddicionals = ({ obert }: { obert?: boolean }) => (
+  <Text titol="Manifestacions addicionals" obert={obert}><LlistaManifestacions items={MANIFESTACIONS_ADDICIONALS} /></Text>
 )
 
 export const TextAnnexII = ({ obert }: { obert?: boolean }) => (
