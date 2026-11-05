@@ -1,6 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
-import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes, useLocation } from 'react-router-dom'
 import { AuthProvider, RequireAdmin, RequireStaff } from './components/Auth'
 import { Layout } from './components/Layout'
 import { Peu } from './components/Peu'
@@ -21,12 +21,19 @@ const NomesAdmin = ({ children }: { children: React.ReactNode }) => (
   <Botiga><RequireAdmin>{children}</RequireAdmin></Botiga>
 )
 
+/** Enllaços antics a /portal: porten a l'arrel conservant ?query i #hash (enllaços d'accés per correu). */
+const AntigaPortal = () => {
+  const { search, hash } = useLocation()
+  return <Navigate to={{ pathname: '/', search, hash }} replace />
+}
+
 createRoot(document.getElementById('root')!).render(
   <StrictMode>
     <AuthProvider>
       <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '') || '/'}>
         <Routes>
-          <Route path="/" element={<Navigate to="/botiga" replace />} />
+          {/* Portal de les persones usuàries: és la pàgina principal */}
+          <Route path="/" element={<Portal />} />
           <Route path="/botiga" element={<Botiga><Cessions /></Botiga>} />
           <Route path="/botiga/nova" element={<NomesAdmin><Lliurament /></NomesAdmin>} />
           <Route path="/botiga/retorn/:id" element={<NomesAdmin><Retorn /></NomesAdmin>} />
@@ -35,9 +42,8 @@ createRoot(document.getElementById('root')!).render(
           <Route path="/botiga/documentacio" element={<NomesAdmin><DocumentsPrograma /></NomesAdmin>} />
           {/* Públic, sense login */}
           <Route path="/inscripcio" element={<Inscripcio />} />
-          <Route path="/portal" element={<Portal />} />
-          {/* Pròximament: /c/:token portal d'usuaris */}
-          <Route path="*" element={<Navigate to="/botiga" replace />} />
+          <Route path="/portal" element={<AntigaPortal />} />
+          <Route path="*" element={<Navigate to="/" replace />} />
         </Routes>
         <Peu />
       </BrowserRouter>
