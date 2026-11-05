@@ -6,7 +6,9 @@ import { Text } from './Documentacio'
  * Textos del programa gestionats des de la botiga (Documentació), amb els PDF adjunts.
  * Es fa servir al portal i abans de signar el lliurament. Si encara no hi ha cap text, mostra `perDefecte`.
  */
-export function DocumentacioPrograma({ perDefecte, obrirPrimer, fase }: { perDefecte: ReactNode; obrirPrimer?: boolean; fase?: 'lliurament' | 'retorn' }) {
+export function DocumentacioPrograma({ perDefecte, obrirPrimer, fase, senseBotonsDescarrega }: {
+  perDefecte: ReactNode; obrirPrimer?: boolean; fase?: 'lliurament' | 'retorn'; senseBotonsDescarrega?: boolean
+}) {
   const [docs, setDocs] = useState<DocumentPrograma[] | null>(null)
   const [error, setError] = useState<string | null>(null)
   useEffect(() => {
@@ -22,7 +24,7 @@ export function DocumentacioPrograma({ perDefecte, obrirPrimer, fase }: { perDef
     setError(null)
     if (d.fitxer_path) obrirPdfDocument(d.fitxer_path, d.fitxer_nom, descarregar).catch((e) => setError((e as Error).message))
   }
-  const ambPdf = docs.filter((d) => d.fitxer_path)
+  const ambPdf = senseBotonsDescarrega ? [] : docs.filter((d) => d.fitxer_path)
 
   return (
     <>
