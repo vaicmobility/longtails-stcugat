@@ -2,7 +2,7 @@ import { useEffect, useMemo, useRef, useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Fotos, Steps } from '../components/Layout'
 import { SignaturePad } from '../components/SignaturePad'
-import { TextAnnexI, TextAnnexIII, TextDadesAjuntament } from '../components/Documentacio'
+import { TextAnnexI, TextAnnexIII, TextDadesAjuntament, TextManifestacionsAddicionals } from '../components/Documentacio'
 import { DocumentacioPrograma } from '../components/DocumentacioPrograma'
 import { ELEMENTS_PER_DEFECTE, ESTATS_ELEMENT, PROGRAMA, canalResum } from '../config'
 import { cercarBicis, cercarUsuariPerEmail, finalitzarLliurament, getCessio, llistarOrganitzacions } from '../lib/api'
@@ -62,7 +62,7 @@ export function Lliurament() {
   const [avis, setAvis] = useState<string | null>(null)
   const [error, setError] = useState<string | null>(null)
   const [desant, setDesant] = useState(false)
-  const [resultat, setResultat] = useState<{ cessioId: string; pdfBlob: Blob } | null>(null)
+  const [resultat, setResultat] = useState<{ cessioId: string; pdfBlob: Blob; pdfManifestacions: Blob } | null>(null)
   const idNou = useRef(crypto.randomUUID()) // id estable: els reintents no dupliquen la cessió
 
   const set = <K extends keyof ActaLliurament>(k: K, v: ActaLliurament[K]) => setA((x) => ({ ...x, [k]: v }))
@@ -202,6 +202,7 @@ export function Lliurament() {
     return (
       <Resultat titol="Lliurament completat" text={`La bicicleta ${bici?.codi ?? ''} queda cedida a ${a.beneficiaria_nom}.`}
         pdfBlob={resultat.pdfBlob} nomFitxer={`acta-lliurament-${bici?.codi ?? ''}`}
+        extres={[{ titol: 'Manifestacions addicionals', blob: resultat.pdfManifestacions, nomFitxer: `manifestacions-addicionals-${bici?.codi ?? ''}` }]}
         onDetall={() => nav(`/botiga/cessio/${resultat.cessioId}`)} />
     )
 
@@ -299,11 +300,11 @@ export function Lliurament() {
             <dt>Fotos</dt><dd>{fotos.length}</dd>
           </dl>
           <h2 className="mt">Documentació per llegir abans de signar</h2>
-          <DocumentacioPrograma obrirPrimer perDefecte={<><TextAnnexI obert /><TextAnnexIII /><TextDadesAjuntament /></>} />
+          <DocumentacioPrograma obrirPrimer perDefecte={<><TextAnnexI obert /><TextManifestacionsAddicionals /><TextAnnexIII /><TextDadesAjuntament /></>} />
           <label className="check">
             <input type="checkbox" checked={!!a.documentacio_llegida_at}
               onChange={(e) => set('documentacio_llegida_at', e.target.checked ? new Date().toISOString() : undefined)} />
-            <span>La persona beneficiària (i, si escau, l'adult autoritzat) ha llegit la documentació del programa que es mostra a dalt. *</span>
+            <span>La persona beneficiària (i, si escau, l'adult autoritzat) ha llegit la documentació del programa que es mostra a dalt, incloses les manifestacions addicionals, que també queden signades amb aquesta signatura. *</span>
           </label>
           <label className="mt">Tècnic VAIC: nom, cognoms i càrrec *
             <input value={a.tecnic_nom} onChange={(e) => set('tecnic_nom', e.target.value)} placeholder="Ex.: Jordi Puig – Mecànic" />
@@ -324,7 +325,7 @@ export function Lliurament() {
       {pas === 4 && (
         <section className="card">
           <h2>Generar l'acta</h2>
-          <p>Es crearà la cessió, es generarà l'acta de lliurament (PDF per imprimir) i quedarà tot desat a la base de dades. L'estat de la bicicleta i el contracte amb l'organització no es modifiquen.</p>
+          <p>Es crearà la cessió, es generaran l'acta de lliurament i les manifestacions addicionals (dos PDF per imprimir) i quedarà tot desat a la base de dades. L'estat de la bicicleta i el contracte amb l'organització no es modifiquen.</p>
           {error ? <div className="alert error">{error}</div> : null}
           <button className="btn primary big" onClick={generar} disabled={desant}>{desant ? 'Generant i desant…' : 'Generar i desar acta'}</button>
         </section>
