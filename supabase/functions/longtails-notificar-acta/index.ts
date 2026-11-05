@@ -101,7 +101,7 @@ Deno.serve(async (req) => {
 
     const resend = new Resend(Deno.env.get('RESEND_API_KEY')!)
     const { error } = await resend.emails.send({
-      from: 'VAIC Mobility · Long tail Sant Cugat <info@vaic.com>', to: [desti], replyTo: EMAIL, subject: assumpte, html,
+      from: 'VAIC Sant Cugat <info@vaic.com>', to: [desti], replyTo: EMAIL, subject: assumpte, html,
     })
     if (error) return json({ error: error.message }, 502)
     return json({ ok: true, a: desti })
