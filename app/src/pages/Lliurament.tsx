@@ -300,7 +300,7 @@ export function Lliurament() {
             <dt>Fotos</dt><dd>{fotos.length}</dd>
           </dl>
           <h2 className="mt">Documentació per llegir abans de signar</h2>
-          <DocumentacioPrograma obrirPrimer perDefecte={<><TextAnnexI obert /><TextManifestacionsAddicionals /><TextAnnexIII /><TextDadesAjuntament /></>} />
+          <DocumentacioPrograma obrirPrimer fase="lliurament" perDefecte={<><TextAnnexI obert /><TextManifestacionsAddicionals /><TextAnnexIII /><TextDadesAjuntament /></>} />
           <label className="check">
             <input type="checkbox" checked={!!a.documentacio_llegida_at}
               onChange={(e) => set('documentacio_llegida_at', e.target.checked ? new Date().toISOString() : undefined)} />
