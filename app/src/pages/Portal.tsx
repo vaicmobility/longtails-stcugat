@@ -140,7 +140,7 @@ function LesMevesCessions({ email }: { email: string }) {
 
       <section className="card" id="documentacio">
         <h2>Documentació del programa</h2>
-        <DocumentacioPrograma perDefecte={<><TextAnnexI /><TextManifestacionsAddicionals /><TextAnnexII /><TextAnnexIII /><TextDadesAjuntament /><TextPrivacitat /></>} />
+        <DocumentacioPrograma senseBotonsDescarrega perDefecte={<><TextAnnexI /><TextManifestacionsAddicionals /><TextAnnexII /><TextAnnexIII /><TextDadesAjuntament /><TextPrivacitat /></>} />
       </section>
     </div>
   )
