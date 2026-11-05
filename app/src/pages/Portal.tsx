@@ -1,13 +1,13 @@
 import { useEffect, useState } from 'react'
 import { useAuth } from '../components/Auth'
 import { CapcaleraPublica } from '../components/Marca'
-import { TextAnnexI, TextAnnexII, TextAnnexIII, TextDadesAjuntament, TextPrivacitat } from '../components/Documentacio'
+import { TextAnnexI, TextAnnexII, TextAnnexIII, TextDadesAjuntament, TextManifestacionsAddicionals, TextPrivacitat } from '../components/Documentacio'
 import { DocumentacioPrograma } from '../components/DocumentacioPrograma'
 import { PROGRAMA } from '../config'
 import { obrirFitxer } from '../lib/fitxers'
 import { data, dataHora, marcaModel } from '../lib/format'
 import { supabase } from '../lib/supabase'
-import type { Cessio, CessioActa } from '../lib/types'
+import type { ActaLliurament, Cessio, CessioActa } from '../lib/types'
 
 type CessioPortal = Cessio & { actes: CessioActa[] }
 
@@ -127,6 +127,9 @@ function LesMevesCessions({ email }: { email: string }) {
             {!l && !r ? <p className="muted">Encara no hi ha documents signats.</p> : null}
             <div style={{ display: 'flex', gap: '.5rem', flexWrap: 'wrap' }}>
               {l?.pdf_path ? <button className="btn small" onClick={() => obrir(l.pdf_path)}>Acta de lliurament (PDF)</button> : null}
+              {(l?.dades as ActaLliurament | undefined)?.manifestacions_pdf_path ? (
+                <button className="btn small" onClick={() => obrir((l!.dades as ActaLliurament).manifestacions_pdf_path!)}>Manifestacions addicionals (PDF)</button>
+              ) : null}
               {r?.pdf_path ? <button className="btn small" onClick={() => obrir(r.pdf_path)}>Acta de devolució (PDF)</button> : null}
             </div>
           </section>
@@ -137,7 +140,7 @@ function LesMevesCessions({ email }: { email: string }) {
 
       <section className="card" id="documentacio">
         <h2>Documentació del programa</h2>
-        <DocumentacioPrograma perDefecte={<><TextAnnexI /><TextAnnexII /><TextAnnexIII /><TextDadesAjuntament /><TextPrivacitat /></>} />
+        <DocumentacioPrograma perDefecte={<><TextAnnexI /><TextManifestacionsAddicionals /><TextAnnexII /><TextAnnexIII /><TextDadesAjuntament /><TextPrivacitat /></>} />
       </section>
     </div>
   )
