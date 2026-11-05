@@ -7,6 +7,9 @@ export type DocumentPrograma = {
   contingut_html: string
   ordre: number
   visible: boolean
+  mostrar_lliurament: boolean
+  mostrar_retorn: boolean
+  clau: string | null
   updated_at: string
   fitxer_path: string | null
   fitxer_nom: string | null
@@ -21,7 +24,7 @@ const ok = <T,>(r: { data: T | null; error: { message: string } | null }): T => 
 
 /** Admin: tots. Persones usuàries: només els visibles (ho garanteix la RLS). */
 export async function llistarDocuments() {
-  return ok(await supabase.from('programa_documents').select('id,titol,contingut_html,ordre,visible,updated_at,fitxer_path,fitxer_nom')
+  return ok(await supabase.from('programa_documents').select('id,titol,contingut_html,ordre,visible,mostrar_lliurament,mostrar_retorn,clau,updated_at,fitxer_path,fitxer_nom')
     .order('ordre').order('created_at')) as DocumentPrograma[]
 }
 
@@ -29,6 +32,7 @@ export async function desarDocument(d: Partial<DocumentPrograma> & { titol: stri
   const camps = {
     titol: d.titol.trim(), contingut_html: netejarHtml(d.contingut_html), visible: d.visible ?? true, ordre: d.ordre ?? 0,
     fitxer_path: d.fitxer_path ?? null, fitxer_nom: d.fitxer_nom ?? null,
+    mostrar_lliurament: d.mostrar_lliurament ?? true, mostrar_retorn: d.mostrar_retorn ?? false,
   }
   if (d.id) return ok(await supabase.from('programa_documents').update(camps).eq('id', d.id).select().single()) as DocumentPrograma
   return ok(await supabase.from('programa_documents').insert(camps).select().single()) as DocumentPrograma
@@ -45,6 +49,14 @@ export async function esborrarDocument(id: string) {
 /** Desa l'ordre de la llista tal com es mostra (0, 1, 2…). */
 export async function desarOrdre(ids: string[]) {
   await Promise.all(ids.map((id, i) => supabase.from('programa_documents').update({ ordre: i }).eq('id', id).then(ok)))
+}
+
+// ---------------------------------------------------------------- Manifestacions addicionals (s'imprimeixen en un PDF a part)
+/** Text vigent de les manifestacions addicionals, tal com està a la Documentació. Null si no hi és. */
+export async function carregarManifestacionsAddicionals(): Promise<string | null> {
+  const r = ok(await supabase.from('programa_documents').select('contingut_html').eq('clau', 'manifestacions_addicionals').maybeSingle()) as { contingut_html: string } | null
+  const html = r?.contingut_html?.trim()
+  return html ? netejarHtml(html) : null
 }
 
 // ---------------------------------------------------------------- Reglament (s'imprimeix a l'acta de lliurament)
