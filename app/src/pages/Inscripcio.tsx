@@ -49,7 +49,7 @@ export function Inscripcio() {
           <h1>Preinscripció enviada</h1>
           <p>Gràcies, {d.nom.split(' ')[0] || 'hem rebut les teves dades'}. Hem rebut les teves dades.</p>
           <p className="muted">El dia del lliurament, a la botiga, només caldrà revisar-les, comprovar la bicicleta i signar l'acta. Porta el teu DNI/NIE.</p>
-          <p className="muted">Després del lliurament podràs consultar la teva bicicleta i la documentació signada a <a href={`${import.meta.env.BASE_URL}portal`}>el teu portal</a>, entrant amb aquest mateix correu.</p>
+          <p className="muted">Després del lliurament podràs consultar la teva bicicleta i la documentació signada a <a href={import.meta.env.BASE_URL}>el teu portal</a>, entrant amb aquest mateix correu.</p>
         </section>
       ) : (
         <form className="card" onSubmit={enviar} noValidate>
