@@ -53,6 +53,7 @@ export type ActaLliurament = {
   adult_nom: string // altra persona adulta autoritzada (signa)
   adult_document?: string // DNI/NIE de l'adult autoritzat (actes antigues no en tenen)
   infant_unitat_familiar: string
+  infant2?: string // segon infant matriculat (opcional); surt a la mateixa casella de l'acta
   lliurament_data_hora: string // ISO
   lliurament_lloc: string
   retorn_data_prevista: string // yyyy-mm-dd
