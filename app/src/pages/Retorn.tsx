@@ -3,6 +3,7 @@ import { useNavigate, useParams } from 'react-router-dom'
 import { Fotos, Steps } from '../components/Layout'
 import { SignaturePad } from '../components/SignaturePad'
 import { TextAnnexII } from '../components/Documentacio'
+import { DocumentacioPrograma } from '../components/DocumentacioPrograma'
 import { ESTATS_ELEMENT, PROGRAMA } from '../config'
 import { finalitzarRetorn, getActes, getCessio } from '../lib/api'
 import { ara, data, durada } from '../lib/format'
@@ -159,12 +160,12 @@ export function Retorn() {
 
       {pas === 2 && (
         <section className="card">
-          <h2>Condicions de l'acta de devolució</h2>
-          <TextAnnexII obert />
+          <h2>Documentació per llegir abans de signar</h2>
+          <DocumentacioPrograma obrirPrimer fase="retorn" perDefecte={<TextAnnexII obert />} />
           <label className="check">
             <input type="checkbox" checked={!!r.documentacio_llegida_at}
               onChange={(e) => set('documentacio_llegida_at', e.target.checked ? new Date().toISOString() : undefined)} />
-            <span>La persona que retorna la bicicleta ha llegit les condicions de l'Annex II. *</span>
+            <span>La persona que retorna la bicicleta ha llegit la documentació de la devolució que es mostra a dalt. *</span>
           </label>
           <h2 className="mt">Signatures</h2>
           <label>Tècnic VAIC: nom, cognoms i càrrec *<input value={r.tecnic_nom} onChange={(e) => set('tecnic_nom', e.target.value)} /></label>
