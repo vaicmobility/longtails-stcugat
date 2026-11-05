@@ -167,7 +167,7 @@ const AnnexI = ({ a, refDoc }: { a: ActaLliurament; refDoc: string }) => (
         ['Altres persones adultes autoritzades', [a.adult_nom, a.adult_document && `DNI/NIE: ${a.adult_document}`].filter(Boolean).join(' · ')],
         ['DNI/NIE o document identificatiu', a.beneficiaria_document],
         ['Telèfon i correu electrònic', [a.beneficiaria_telefon, a.beneficiaria_email].filter(Boolean).join(' · ')],
-        ['Infant matriculat / unitat familiar', a.infant_unitat_familiar],
+        ['Infant matriculat / unitat familiar', [a.infant_unitat_familiar, a.infant2].map((x) => x?.trim()).filter(Boolean).join('\n')],
         ['Data i hora de lliurament', dataHora(a.lliurament_data_hora)],
         ['Lloc de lliurament', a.lliurament_lloc],
         ['Data prevista de retorn', data(a.retorn_data_prevista)],
