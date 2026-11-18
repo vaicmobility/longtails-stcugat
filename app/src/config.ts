@@ -14,6 +14,8 @@ export const PROGRAMA = {
     horari: 'De dilluns a divendres: de 10:00 a 14:00 i de 16:00 a 20:00',
     urgencies: '936 75 45 70',
   },
+  // Enquesta de valoració (es mostra al portal un cop retornada la bicicleta i al correu de devolució)
+  enquesta: 'https://docs.google.com/forms/d/e/1FAIpQLScaWvQqXKl0wE8txtqw0XYYp_OJWG-W_wSu6XpoOU-3JyT4kQ/viewform?usp=send_form',
   // Filtre per defecte en cercar bicis disponibles
   tipus_bici_programa: ['longtail', 'cargo'],
 }
