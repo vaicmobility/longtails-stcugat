@@ -136,6 +136,14 @@ function LesMevesCessions({ email }: { email: string }) {
         )
       })}
 
+      {cessions.some((c) => c.estat === 'finalitzada' || c.actes.some((a) => a.fase === 'retorn' && a.signat_at)) ? (
+        <section className="card">
+          <h2>La teva opinió compta</h2>
+          <p>Gràcies per participar en el programa de bicicletes longtail. Ens ajudaria molt que dediquessis uns minuts a respondre l'enquesta de valoració.</p>
+          <a className="btn primary" href={PROGRAMA.enquesta} target="_blank" rel="noreferrer">Respondre l'enquesta</a>
+        </section>
+      ) : null}
+
       <Incidencies cessions={cessions.filter((c) => c.estat === 'activa')} />
 
       <section className="card" id="documentacio">
